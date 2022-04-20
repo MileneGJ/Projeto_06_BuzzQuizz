@@ -19,29 +19,45 @@
     <div class="barra topo">
         BuzzQuizz
     </div>
+
+
+
     <div class="container1">
         <div class="semQuizz">
             <p>Você não criou nenhum quizz ainda :(</p>
-            <button onclick="aparecerTela3()">Criar Quizz</button>
+            <button onclick="aparecerCriarQuizz()">Criar Quizz</button>
+        </div>
+        <div class="comQuizz escondido">
+            <div>
+            <h1>Seus Quizzes</h1>
+            <ion-icon name="add-circle" onclick="aparecerCriarQuizz()">></ion-icon>
+            </div>
+        <div class="ListaQuizzesUser">
+            
+        </div>
+
         </div>
         <h1>Todos os Quizzes</h1>
         <div class="ListaQuizzes">
-            <div class="quizz">
-                <img src="" alt="">
-                <h2>Texto do Quizz</h2>
-            </div>
+            
         </div>
     </div>
+
+
+
     <div class="container3 escondido">
         <h1>Comece pelo começo</h1>
         <div>
-            <input type="text" placeholder="Título do seu quizz">
-            <input type="text" placeholder="URL da imagem do seu quizz">
-            <input type="text" placeholder="Quantidade de perguntas do quizz">
-            <input type="text" placeholder="Quantidade de níveis do quizz">
+            <input class="titulo" type="text" placeholder="Título do seu quizz">
+            <input class="imagem" type="url" placeholder="URL da imagem do seu quizz">
+            <input class="nPerguntas" type="text" placeholder="Quantidade de perguntas do quizz">
+            <input class="nNiveis" type="text" placeholder="Quantidade de níveis do quizz">
         </div>
-        <button>Prosseguir para criar perguntas</button>
+        <button onclick="CriarPerguntas()">Prosseguir para criar perguntas</button>
     </div>
+
+
+    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./script/script.js"></script>
 </body>
