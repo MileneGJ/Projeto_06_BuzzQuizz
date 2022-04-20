@@ -1,12 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/estilos.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@100;200;300;400;500;600;700&family=Righteous&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+
+    <title>BuzzQuizz</title>
 </head>
+
 <body>
-    
+    <div class="barra topo">
+        BuzzQuizz
+    </div>
+    <div class="container1">
+        <div class="semQuizz">
+            <p>Você não criou nenhum quizz ainda :(</p>
+            <button onclick="aparecerTela3()">Criar Quizz</button>
+        </div>
+        <h1>Todos os Quizzes</h1>
+        <div class="ListaQuizzes">
+            <div class="quizz">
+                <img src="" alt="">
+                <h2>Texto do Quizz</h2>
+            </div>
+        </div>
+    </div>
+    <div class="container3 escondido">
+        <h1>Comece pelo começo</h1>
+        <div>
+            <input type="text" placeholder="Título do seu quizz">
+            <input type="text" placeholder="URL da imagem do seu quizz">
+            <input type="text" placeholder="Quantidade de perguntas do quizz">
+            <input type="text" placeholder="Quantidade de níveis do quizz">
+        </div>
+        <button>Prosseguir para criar perguntas</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./script/script.js"></script>
 </body>
+
 </html>
