@@ -179,7 +179,7 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     justify-content: center;
     background: rgba(0, 0, 0, 0.6);
 }
-.pergunta {
+.pergunta, .resultadoQuizz {
     background-color: #FFFFFF;
     width: 60%;
     box-shadow: 0 0 5px rgba(150, 150, 150, 0.1);
@@ -188,7 +188,12 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     margin-top: 50px;
 
 }
-.pergunta h3 {
+.resultadoQuizz{
+    padding:15px;
+    margin-bottom: 60px;
+}
+
+.pergunta h3, .resultadoQuizz h3 {
     color: #FFFFFF;
     font-size: 23px;
     font-weight: bold;
@@ -197,6 +202,26 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.resultadoQuizz h3{
+    height:100px;
+    margin-bottom: 20px;
+}
+
+.resultadoQuizz >div{
+    display: flex;
+    justify-content: space-between;
+}
+.resultadoQuizz img{
+    width:90%;
+    height:280px;
+}
+.resultadoQuizz p{
+    font-size: 20px;
+    font-weight: bold;
+    color:#484848;
+    width:90%;
+    margin-left:20px;
 }
 .pergunta>div {
     display: flex;
@@ -242,10 +267,8 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     text-align: center;
 }
 
-.questions  h2,
-.questions  h3,
-.questions  h4{
-    margin: 10px 0;
+.questions  h1{
+    margin: 30px 0 10px 0;
 }
 
 .container3>div{
@@ -268,11 +291,10 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 0 10px;
+    padding: 0 20px;
     width: 600px;
-    
     box-sizing: border-box;
-    margin:50px;
+    margin:50px 0;
     box-shadow: 0 0 4px 2px rgba(150, 150, 150, 0.1);
 }
 
@@ -287,6 +309,9 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     font-size: 20px;
 }
 
+.editForm h1{
+    margin: 15px 0;
+}
 
 .container3 input,
 .container4 input {
@@ -340,7 +365,7 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
         justify-content: space-between;
         align-items: center;
     }
-    .container2 .pergunta{
+    .pergunta, .resultadoQuizz{
         width:100%;
         margin-top: 30px;
     }
@@ -350,7 +375,7 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     .img-titulo,.img-titulo h2{
         height:140px;
     }
-    .pergunta h3{
+    .pergunta h3, .resultadoQuizz h3{
         height:90px;
         font-size: 20px;
     }
@@ -360,7 +385,9 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     .resposta p{
         font-size: 13px;
     }
-
+    .resultadoQuizz p{
+        font-size: 17px;
+    }
     .container3>div {
         width: 100%;
     }
@@ -370,5 +397,11 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     .container3 button{
         font-size:18px;
         margin-top: 0;
+    }
+    .questions{
+        width:100%;
+    }
+    .question{
+        width:100%;
     }
 }
