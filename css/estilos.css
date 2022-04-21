@@ -13,6 +13,15 @@ body {
     display: none;
 }
 
+.esbranquicado{
+    background-color: rgba(255,255,255,0.7);
+    width:100%;
+    height:100%;
+    position:absolute;
+    top:0%;
+    left:0;
+}
+
 .topo {
     width: 100%;
     display: flex;
@@ -199,6 +208,7 @@ h1 {
 .resposta{
     margin-top:20px;
     width:48%;
+    position:relative;
 }
 .resposta img {
     width: 100%;
@@ -212,6 +222,12 @@ h1 {
     word-wrap: wrap;
     width: 100%;
     margin: 15px 0;
+}
+.resposta .selectCerto{
+    color:#009C22;
+}
+.resposta .selectErrado{
+    color:#FF0B0B;
 }
 
 /*  TELA 2 - Abrindo um Quizz  */
@@ -287,10 +303,6 @@ h1 {
         width: 90%;
     }
 
-    .container3>div {
-        width: 100%;
-    }
-
     .comQuizz>div {
         justify-content: space-between;
         align-items: center;
@@ -298,5 +310,32 @@ h1 {
     .container2 .pergunta{
         width:100%;
         margin-top: 30px;
+    }
+    .img-titulo h2{
+        font-size:20px;
+    }
+    .img-titulo,.img-titulo h2{
+        height:140px;
+    }
+    .pergunta h3{
+        height:90px;
+        font-size: 20px;
+    }
+    .resposta img{
+        height:110px;
+    }
+    .resposta p{
+        font-size: 13px;
+    }
+
+    .container3>div {
+        width: 100%;
+    }
+    .container3 h1{
+        font-size: 20px;
+    }
+    .container3 button{
+        font-size:18px;
+        margin-top: 0;
     }
 }
