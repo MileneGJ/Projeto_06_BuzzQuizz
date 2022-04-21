@@ -554,8 +554,3 @@ function getMyQuizIdInServer(idQuizz) {
         });
     }
 }
-
-
-
-
-nextToSucess();
