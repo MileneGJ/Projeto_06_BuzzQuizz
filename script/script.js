@@ -63,9 +63,26 @@ function CriarPerguntas() {
     const nPerguntas = document.querySelector(".container3 .nPerguntas").value;
     const nNiveis = document.querySelector(".container3 .nNiveis").value;
 
-    const isAllowed = VerificarInputsTela3(titulo, imagem, nPerguntas, nNiveis);
-    
-    if (isAllowed) {
+    let isValidInputs = true;
+
+    if(titulo.length<22||titulo.length>65){
+        alert("Titulo deve conter entre 20 e 65 caracteres");
+        isValidInputs = false;
+    } 
+    if(!isValidHttpUrl(imagem)){
+        alert("Insira um url válido como imagem");
+        isValidInputs = false;
+    } 
+    if(Number(nPerguntas)<3){
+        alert("Adicione pelo menos 3 perguntas");
+        isValidInputs = false;
+    } 
+    if(Number(nNiveis)<2){
+        alert("Adicione pelo menos 2 níveis");
+        isValidInputs = false;
+    }
+
+    if(isValidInputs) {
         showQuestions();
         renderQuestions(titulo, imagem, nPerguntas, nNiveis);
     }
@@ -174,13 +191,13 @@ function renderQuestions(title, img, nQuestions, nLevels) {
                 <h4>Respostas incorretas</h4>
 
                 <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
-                <input class="wrongAnswer1URL" type="url" placeholder="URL da imagem 1">
+                <input class="wrongAnswerURL1" type="url" placeholder="URL da imagem 1">
 
                 <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
-                <input class="wrongAnswer2URL" type="url" placeholder="URL da imagem 2">
+                <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
 
                 <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
-                <input class="wrongAnswer3URL" type="url" placeholder="URL da imagem 3">
+                <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
             </div>
             `;
         } else {
@@ -203,13 +220,13 @@ function renderQuestions(title, img, nQuestions, nLevels) {
                 <h4>Respostas incorretas</h4>
 
                 <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
-                <input class="wrongAnswer1URL" type="url" placeholder="URL da imagem 1">
+                <input class="wrongAnswerURL1" type="url" placeholder="URL da imagem 1">
 
                 <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
-                <input class="wrongAnswer2URL" type="url" placeholder="URL da imagem 2">
+                <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
 
                 <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
-                <input class="wrongAnswer3URL" type="url" placeholder="URL da imagem 3">
+                <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
                 </div>
             </div>
             `;
@@ -233,20 +250,48 @@ function callNextQuestion(element) {
     element.querySelector('.form').classList.remove('escondido');
 
 }
-function nextToMakeLevels() {
-    const teste = document.querySelectorAll('.question');
-    for (let i = 0; i < teste.length; i++) {
-        if (teste[i].querySelector('.questionText').value.length < 20) {
-            console.log(`errorText ${i}`);
+function nextToMakeLevels(){
+    const getQuestion = document.querySelectorAll('.question');
+    let check = true;
+    for(let i = 0 ; i< getQuestion.length ; i++) {
+
+        if(getQuestion[i].querySelector('.questionText').value.length < 20 ) {
+            console.log(`O texto da pergunta ${i} precisa ser menor que 20 carácteres`);
+            check = false;
         }
 
-        if (!isValidColor(teste[i].querySelector('.questionBackground').value)) {
-            console.log(`errorColor ${i}`);
+        if(!isValidColor(getQuestion[i].querySelector('.questionBackground').value )) {
+            console.log(`A cor de fundo da pergunta ${i} deve ser no formato "#FFFFFF`);
+            check = false;
+        }
+        
+        if(getQuestion[i].querySelector('.rightAnswer').value === '') {
+            console.log(`A resposta correta da pergunta ${i} não pode estar em branco`);
+            check = false;
         }
 
-        if (teste[i].querySelector('.rightAnswer').value === '' || (teste[i].querySelector('.wrongAnswer1').value === ''
-            && teste[i].querySelector('.wrongAnswer2').value === '' && teste[i].querySelector('.wrongAnswer3').value === '')) {
-            console.log(`ErrorAnswers ${i}`);
+        if(getQuestion[i].querySelector('.wrongAnswer1').value === '' 
+        && getQuestion[i].querySelector('.wrongAnswer2').value === '' 
+        && getQuestion[i].querySelector('.wrongAnswer3').value === '') {
+            console.log(`Pelo menos uma resposta incorreta deve ser preenchida`);
+            check = false;
         }
+          
+        if(!isValidHttpUrl(getQuestion[i].querySelector('.rightAnswerURL').value)) {
+            console.log(`A URL da imagem da resposta correta da pergunta ${i} é inválido`);
+            check = false;
+        }
+
+        if(getQuestion[i].querySelector(`.wrongAnswer${i+1}`).value !== '' &&
+        !isValidHttpUrl(getQuestion[i].querySelector(`.wrongAnswerURL${i+1}`).value)) {
+            console.log(`A URL da imagem da resposta incorreta da pergunta ${i} é inválido`);
+            check = false;
+        }
+
+        
+    }
+
+    if(check) {
+        alert('niceeee');
     }
 }
