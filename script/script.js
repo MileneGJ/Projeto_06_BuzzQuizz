@@ -256,38 +256,45 @@ function nextToMakeLevels(){
     for(let i = 0 ; i< getQuestion.length ; i++) {
 
         if(getQuestion[i].querySelector('.questionText').value.length < 20 ) {
-            console.log(`O texto da pergunta ${i} precisa ser menor que 20 carácteres`);
+            console.log(`O texto da pergunta ${i+1} precisa ter pelo menos 20 carácteres`);
             check = false;
         }
 
         if(!isValidColor(getQuestion[i].querySelector('.questionBackground').value )) {
-            console.log(`A cor de fundo da pergunta ${i} deve ser no formato "#FFFFFF`);
+            console.log(`A cor de fundo da pergunta ${i+1} deve ser no formato "#FFFFFF`);
             check = false;
         }
         
         if(getQuestion[i].querySelector('.rightAnswer').value === '') {
-            console.log(`A resposta correta da pergunta ${i} não pode estar em branco`);
+            console.log(`A resposta correta da pergunta ${i+1} não pode estar em branco`);
             check = false;
         }
 
         if(getQuestion[i].querySelector('.wrongAnswer1').value === '' 
         && getQuestion[i].querySelector('.wrongAnswer2').value === '' 
         && getQuestion[i].querySelector('.wrongAnswer3').value === '') {
-            console.log(`Pelo menos uma resposta incorreta deve ser preenchida`);
+            console.log(`Pelo menos uma resposta incorreta  da pergunta ${i+1} deve ser preenchida`);
             check = false;
         }
           
         if(!isValidHttpUrl(getQuestion[i].querySelector('.rightAnswerURL').value)) {
-            console.log(`A URL da imagem da resposta correta da pergunta ${i} é inválido`);
+            console.log(`A URL da imagem da resposta correta da pergunta ${i+1} é inválido`);
             check = false;
         }
 
-        if(getQuestion[i].querySelector(`.wrongAnswer${i+1}`).value !== '' &&
-        !isValidHttpUrl(getQuestion[i].querySelector(`.wrongAnswerURL${i+1}`).value)) {
-            console.log(`A URL da imagem da resposta incorreta da pergunta ${i} é inválido`);
-            check = false;
-        }
+        for(let j= 1; j <=3; j++) {
+            if(getQuestion[i].querySelector(`.wrongAnswer${j}`).value !== '' &&
+                !isValidHttpUrl(getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value)) {
+                console.log(`A URL da imagem da resposta ${j} incorreta da pergunta ${i+1} é inválido`);
+                check = false;
+            } else if (getQuestion[i].querySelector(`.wrongAnswer${j}`).value === '' &&
+            getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value !== '') {
+                console.log(`A resposta incorreta ${j} da pergunta ${i+1} está em branco`);
+                check = false;
+            }
 
+        }
+        
         
     }
 
