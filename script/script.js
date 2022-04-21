@@ -32,31 +32,42 @@ function aparecerCriarQuizz() {
     tela3.classList.remove("escondido");
 }
 
-function VerificarInputsTela3() {
-    const titulo = document.querySelector(".container3 .titulo");
-    const imagem = document.querySelector(".container3 .imagem");
-    const nPerguntas = document.querySelector(".container3 .nPerguntas");
-    const nNiveis = document.querySelector(".container3 .nNiveis");
+function VerificarInputsTela3(titulo, imagem, nPerguntas, nNiveis) {
     let msgAlerta = "";
     let alertar = false
-    if (titulo.value.length < 22 || titulo.value.length > 65) {
+    if (titulo.length < 22 || titulo.length > 65) {
         msgAlerta += "Titulo deve conter entre 20 e 65 caracteres\n";
         alertar = true;
     }
-    if (!isValidHttpUrl(imagem.value)) {
+    if (!isValidHttpUrl(imagem)) {
         msgAlerta += "Insira um url válido como imagem\n";
         alertar = true;
     }
-    if (Number(nPerguntas.value) < 3) {
+    if (Number(nPerguntas) < 3) {
         msgAlerta += "Adicione pelo menos 3 perguntas\n";
         alertar = true;
     }
-    if (Number(nNiveis.value) < 2) {
+    if (Number(nNiveis) < 2) {
         msgAlerta += "Adicione pelo menos 2 níveis\n";
         alertar = true;
     }
     if (alertar) {
         alert(msgAlerta);
+    }
+    return !alertar;
+}
+
+function CriarPerguntas() {
+    const titulo = document.querySelector(".container3 .titulo").value;
+    const imagem = document.querySelector(".container3 .imagem").value;
+    const nPerguntas = document.querySelector(".container3 .nPerguntas").value;
+    const nNiveis = document.querySelector(".container3 .nNiveis").value;
+
+    const isAllowed = VerificarInputsTela3(titulo, imagem, nPerguntas, nNiveis);
+    
+    if (isAllowed) {
+        showQuestions();
+        renderQuestions(titulo, imagem, nPerguntas, nNiveis);
     }
 }
 //Achei essa função aqui https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
@@ -107,31 +118,135 @@ function aparecerQuizz(element) {
 
 }
 
-function validarResposta(element){
+function validarResposta(element) {
     let descricao = element.querySelector("p");
-    if(descricao.classList.contains("selectCerto")||
-    descricao.classList.contains("selectErrado")){
-    }else{
-    let AllAnswers = element.parentNode.querySelectorAll(".resposta > div");
-    for(let i=0;i<AllAnswers.length;i++){
-        AllAnswers[i].classList.add("esbranquicado");
-        let respostaInteira = AllAnswers[i].parentNode;
-        let respostaDescricao = respostaInteira.querySelector("p");
-        if(respostaInteira.classList.contains("trueSelect")){
-            respostaDescricao.classList.add("selectCerto");
+    if (descricao.classList.contains("selectCerto") ||
+        descricao.classList.contains("selectErrado")) {
+    } else {
+        let AllAnswers = element.parentNode.querySelectorAll(".resposta > div");
+        for (let i = 0; i < AllAnswers.length; i++) {
+            AllAnswers[i].classList.add("esbranquicado");
+            let respostaInteira = AllAnswers[i].parentNode;
+            let respostaDescricao = respostaInteira.querySelector("p");
+            if (respostaInteira.classList.contains("trueSelect")) {
+                respostaDescricao.classList.add("selectCerto");
+            }
+            if (respostaInteira.classList.contains("falseSelect")) {
+                respostaDescricao.classList.add("selectErrado");
+            }
         }
-        if(respostaInteira.classList.contains("falseSelect")){
-            respostaDescricao.classList.add("selectErrado");
-        }
+        element.querySelector("div").classList.remove("esbranquicado");
+        setTimeout(function () { ScrollPerguntaSeguinte(element) }, 2000);
     }
-    element.querySelector("div").classList.remove("esbranquicado");
-    setTimeout(function(){ScrollPerguntaSeguinte(element)},2000);
-}   
 }
 
-function ScrollPerguntaSeguinte(element){
+function ScrollPerguntaSeguinte(element) {
     let pergunta = element.parentNode.parentNode;
-    if(pergunta.nextElementSibling!==null){
-    pergunta.nextElementSibling.scrollIntoView({ behavior: 'smooth' });
+    if (pergunta.nextElementSibling !== null) {
+        pergunta.nextElementSibling.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function showQuestions() {
+    const tela1 = document.querySelector(".container3");
+    tela1.classList.add("escondido");
+    const tela2 = document.querySelector(".container4");
+    tela2.classList.remove("escondido");
+}
+
+function renderQuestions(title, img, nQuestions, nLevels) {
+    const questionHTML = document.querySelector('.container4 div');
+    questionHTML.innerHTML = '';
+    for (let i = 0; i < nQuestions; i++) {
+        if (i === 0) {
+            questionHTML.innerHTML += `
+            <div class="question">
+                <span class="index escondido">${i}</span>
+                <h2>Pergunta ${i + 1}</h2>
+                <input class="questionText" type="text" placeholder="Texto da pergunta">
+                <input class="questionBackground" type="text" placeholder="Cor de fundo da pergunta">
+                
+                <h3>Resposta correta</h3>
+
+                <input class="rightAnswer" type="text" placeholder="Resposta correta">
+                <input class="rightAnswerURL" type="url" placeholder="URL da imagem">
+
+                <h4>Respostas incorretas</h4>
+
+                <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
+                <input class="wrongAnswer1URL" type="url" placeholder="URL da imagem 1">
+
+                <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                <input class="wrongAnswer2URL" type="url" placeholder="URL da imagem 2">
+
+                <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                <input class="wrongAnswer3URL" type="url" placeholder="URL da imagem 3">
+            </div>
+            `;
+        } else {
+            questionHTML.innerHTML += `
+            <div class="question" onclick="callNextQuestion(this)">
+                <span class="index escondido">${i}</span>
+                <div class = "editForm" >
+                    <h2>Pergunta ${i + 1}</h2>
+                    <ion-icon name="create-outline"></ion-icon>
+                </div>
+                <div class="form escondido">
+                <input class="questionText" type="text" placeholder="Texto da pergunta">
+                <input class="questionBackground" type="text" placeholder="Cor de fundo da pergunta">
+                
+                <h3>Resposta correta</h3>
+
+                <input class="rightAnswer" type="text" placeholder="Resposta correta">
+                <input class="rightAnswerURL" type="url" placeholder="URL da imagem">
+
+                <h4>Respostas incorretas</h4>
+
+                <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
+                <input class="wrongAnswer1URL" type="url" placeholder="URL da imagem 1">
+
+                <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                <input class="wrongAnswer2URL" type="url" placeholder="URL da imagem 2">
+
+                <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                <input class="wrongAnswer3URL" type="url" placeholder="URL da imagem 3">
+                </div>
+            </div>
+            `;
+
+
+        }
+
+    }
+
+}
+
+function isValidColor(color) {
+    const regExp = new RegExp(/^#[0-9A-F]{6}$/i);
+    if (!regExp.test(color)) {
+        return false;
+    }
+    return true;
+}
+
+function callNextQuestion(element) {
+    element.querySelector('.form').classList.remove('escondido');
+
+}
+function nextToMakeLevels() {
+    const teste = document.querySelectorAll('.question');
+    for (let i = 0; i < teste.length; i++) {
+        if (teste[i].querySelector('.questionText').value.length < 20) {
+            console.log(`errorText ${i}`);
+        }
+
+        if (!isValidColor(teste[i].querySelector('.questionBackground').value)) {
+            console.log(`errorColor ${i}`);
+        }
+
+        if (teste[i].querySelector('.rightAnswer').value === '' || (teste[i].querySelector('.wrongAnswer1').value === ''
+            && teste[i].querySelector('.wrongAnswer2').value === '' && teste[i].querySelector('.wrongAnswer3').value === '')) {
+            console.log(`ErrorAnswers ${i}`);
+        }
     }
 }
