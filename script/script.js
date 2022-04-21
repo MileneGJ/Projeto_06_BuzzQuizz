@@ -1,19 +1,19 @@
-const API = `https://mock-api.driven.com.br/api/v6/buzzquizz`;
+const API = `https://mock-api.driven.com.br/api/v6/buzzquizz/quizzes`;
 
 //  TELA 1 - Lista de Quizzes
 
 let listaQuizzes = [];
-let promise = axios.get(`${API}/quizzes`);
+let promise = axios.get(`${API}`);
 promise.then(renderizarQuizzes);
 promise.catch(tratarErro);
 
-const getMyQuizzesID = JSON.parse(localStorage.getItem("myID"));
+/*const getMyQuizzesID = JSON.parse(localStorage.getItem("myID"));
 if (getMyQuizzesID.length !== 0) {
     const semQuizz = document.querySelector(".semQuizz");
     semQuizz.classList.add("escondido");
     const comQuizz = document.querySelector(".comQuizz");
     comQuizz.classList.remove("escondido");
-}
+}*/
 
 function renderizarQuizzes(response) {
     listaQuizzes = response.data;
@@ -490,7 +490,7 @@ function nextToSucessQuizz() {
 }
 
 function HandleSendDataToServer(data) {
-    const send = axios.post(`${API}/quizzes`,data);
+    const send = axios.post(`${API}`,data);
     send.then(SaveMyIDQuizz);
 
 }
@@ -509,12 +509,53 @@ function SaveMyIDQuizz (response){
 
     idS = JSON.stringify(idD);
     localStorage.setItem('myID',idS);
+
+    nextToSucess();
 }
 
 
+
+function nextToSucess(){
+    const getMyQuizzes = JSON.parse(localStorage.getItem("myID"));
+    const getMyLastQuizz = getMyQuizzes[getMyQuizzes.length -1];
+
+    getMyQuizIdInServer(getMyLastQuizz);
+}
 
 function getMyQuizIdInServer(idQuizz) {
-    const send = axios.get(`${API}/idQuizz`);
-    send.then(SaveMyIDQuizz);
+    const getMyQuiz = axios.get(`${API}/${idQuizz}`);
+    getMyQuiz.then(renderSucess);
 
+    function renderSucess(getData){
+
+        const dataFromServer = getData.data;
+        console.log(dataFromServer);
+        const SucessHTML = document.querySelector('.container4')
+        SucessHTML.innerHTML = '';
+        SucessHTML.innerHTML += `<h1>Seu quizz está pronto!</h1>`;
+        SucessHTML.innerHTML+= 
+        `<div class="quizz">
+            <img src=${dataFromServer.image}>
+            <h2>${dataFromServer.title}</h2>
+        </div>
+        <button class="loadMyQuizz">Acessar Quizz</button>
+
+        <button class="home">Voltar pra home</button>
+        `;
+
+        document.querySelector('.home').
+        addEventListener('click', () => document.location.reload());
+
+        document.querySelector('.loadMyQuizz').
+        addEventListener('click', function() {
+            SucessHTML.innerHTML = '';
+
+            
+        });
+    }
 }
+
+
+
+
+nextToSucess();
