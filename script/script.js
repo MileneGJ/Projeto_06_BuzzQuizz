@@ -28,13 +28,18 @@ function renderizarQuizzes(response) {
             quizzesUser.innerHTML += `<div class="quizz" id="${response.data[i].id}" onclick="aparecerQuizz(this)">
             <img src=${response.data[i].image}>
             <h2>${response.data[i].title}</h2>
-
+            <div>
+            <ion-icon name="trash-outline"></ion-icon>
+            </div>
         </div>`
             isFromUser = false;
         } else {
             quizzes.innerHTML += `<div class="quizz" id="${response.data[i].id}" onclick="aparecerQuizz(this)">
         <img src=${response.data[i].image}>
         <h2>${response.data[i].title}</h2>
+        <div>
+        <ion-icon name="trash-outline"></ion-icon>
+        </div>
     </div>`
         }
     }
