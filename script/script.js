@@ -5,37 +5,50 @@ const API = `https://mock-api.driven.com.br/api/v6/buzzquizz/quizzes`;
 let listaQuizzes = [];
 let promise = axios.get(`${API}`);
 promise.then(renderizarQuizzes);
-promise.catch(tratarErro);
 
-/*const getMyQuizzesID = JSON.parse(localStorage.getItem("myID"));
-if (getMyQuizzesID.length !== 0) {
-    const semQuizz = document.querySelector(".semQuizz");
-    semQuizz.classList.add("escondido");
-    const comQuizz = document.querySelector(".comQuizz");
-    comQuizz.classList.remove("escondido");
-}*/
+const getMyQuizzesID = JSON.parse(localStorage.getItem("myID"));
 
 function renderizarQuizzes(response) {
     listaQuizzes = response.data;
     let quizzes = document.querySelector(".ListaQuizzes");
+    let quizzesUser = document.querySelector(".ListaQuizzesUser");
+    let isFromUser
+    let ShowListUser
     quizzes.innerHTML = "";
+    quizzesUser.innerHTML = "";
+
     for (let i = 0; i < response.data.length; i++) {
-        quizzes.innerHTML += `<div class="quizz" id="${response.data[i].id}" onclick="aparecerQuizz(this)">
+        getMyQuizzesID.map(function (x) {
+            if (x === response.data[i].id) {
+                isFromUser = true;
+                ShowListUser = true;
+            }
+        });
+        if (isFromUser) {
+            quizzesUser.innerHTML += `<div class="quizz" id="${response.data[i].id}" onclick="aparecerQuizz(this)">
+            <img src=${response.data[i].image}>
+            <h2>${response.data[i].title}</h2>
+
+        </div>`
+            isFromUser = false;
+        } else {
+            quizzes.innerHTML += `<div class="quizz" id="${response.data[i].id}" onclick="aparecerQuizz(this)">
         <img src=${response.data[i].image}>
         <h2>${response.data[i].title}</h2>
     </div>`
+        }
+    }
+
+    const semQuizz = document.querySelector(".semQuizz");
+    const comQuizz = document.querySelector(".comQuizz");
+    if (ShowListUser) {
+        comQuizz.classList.remove("escondido");
+    } else {
+        semQuizz.classList.remove("escondido");
     }
 }
-function tratarErro(erro) {
-    alert("Deu o erro " + erro.response.status);
-}
 
-function aparecerCriarQuizz() {
-    const tela1 = document.querySelector(".container1");
-    tela1.classList.add("escondido");
-    const tela3 = document.querySelector(".container3");
-    tela3.classList.remove("escondido");
-}
+
 
 
 
@@ -50,12 +63,16 @@ function comparador() {
 //Usar infos do quizz selecionado para criar tela 2
 let quizzSelect = [];
 let questoes = [];
+let InfosquizzSelect
 function aparecerQuizz(element) {
+    InfosquizzSelect = element
     quizzSelect = listaQuizzes.filter(p => Number(p.id) === Number(element.id));
     const tela1 = document.querySelector(".container1");
-    tela1.classList.add("escondido");
     const tela2 = document.querySelector(".container2");
-    tela2.classList.remove("escondido");
+    if (tela2.classList.contains("escondido")) {
+        tela1.classList.add("escondido");
+        tela2.classList.remove("escondido");
+    }
     tela2.innerHTML = ""
     tela2.innerHTML += `<div class="img-titulo">
     <img src=${quizzSelect[0].image}>
@@ -64,7 +81,7 @@ function aparecerQuizz(element) {
     questoes = quizzSelect[0].questions;
     for (let i = 0; i < questoes.length; i++) {
         tela2.innerHTML += `<div class="pergunta">
-        <h3 style="background-color:${questoes[i].color};">${questoes[i].title}</h3>
+        <span style="background-color:${questoes[i].color};"><h3>${questoes[i].title}</h3></span>
         <div></div>
         </div>`
         const DivPergunta = tela2.querySelector(".pergunta:last-child div");
@@ -78,7 +95,7 @@ function aparecerQuizz(element) {
             </div>`
         }
     }
-
+    tela2.querySelector(".img-titulo").scrollIntoView({ behavior: 'smooth' });
 }
 
 // Ação de passar para a próxima pergunta
@@ -114,7 +131,8 @@ function corrigirResposta(element) {
         element.classList.add("RespSelecionada");
         setTimeout(function () { ScrollPerguntaSeguinte(element) }, 2000);
         if (contadorRespostas === questoes.length) {
-            mostrarResultado();
+            setTimeout(mostrarResultado, 2000);
+            contadorRespostas = 0;
         }
     }
 }
@@ -138,22 +156,38 @@ function mostrarResultado() {
         if (acertosPorct >= niveis[i].minValue) {
             let tela2 = document.querySelector(".container2");
             tela2.innerHTML += `<div class="resultadoQuizz">
-   <h3 style="background-color:#EC362D;">${acertosPorct}% de acerto: ${niveis[i].title}</h3>
+        <span style="background-color:#EC362D;"><h3>${acertosPorct}% de acerto: ${niveis[i].title}</h3></span>
    <div>
    <img src=${niveis[i].image}>
    <p>${niveis[i].text}</p>
    </div>
-   </div>`
+   </div>
+   <button onclick="reiniciarQuizz()">Reiniciar Quizz</button>
+   <button class="home" onclick="voltarHome()">Voltar pra home</button>`
             break
         }
     }
-    document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' })
+    acertos = 0;
+    document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
 }
 
+function voltarHome() {
+    window.location.reload();
+}
 
-
+function reiniciarQuizz() {
+    aparecerQuizz(InfosquizzSelect);
+}
 
 // TELA 3 - Criar Quizz
+
+
+function aparecerCriarQuizz() {
+    const tela1 = document.querySelector(".container1");
+    tela1.classList.add("escondido");
+    const tela3 = document.querySelector(".container3");
+    tela3.classList.remove("escondido");
+}
 
 let sendToServer = {
     title: 'titulo',
@@ -199,7 +233,7 @@ function VerificarInputsIniciais(titulo, imagem, nPerguntas, nNiveis) {
 }
 
 // Validação completa para iniciar a criação de perguntas
-    let nNiveis;
+let nNiveis;
 function CriarPerguntas() {
     const titulo = document.querySelector(".container3 .titulo").value;
     const imagem = document.querySelector(".container3 .imagem").value;
@@ -306,47 +340,47 @@ function nextToMakeLevels() {
     let check = true;
     for (let i = 0; i < getQuestion.length; i++) {
 
-        if(getQuestion[i].querySelector('.questionText').value.length < 20 ) {
-            console.log(`O texto da pergunta ${i+1} precisa ter pelo menos 20 carácteres`);
+        if (getQuestion[i].querySelector('.questionText').value.length < 20) {
+            console.log(`O texto da pergunta ${i + 1} precisa ter pelo menos 20 carácteres`);
             check = false;
         }
 
-        if(!isValidColor(getQuestion[i].querySelector('.questionBackground').value )) {
-            console.log(`A cor de fundo da pergunta ${i+1} deve ser no formato "#FFFFFF`);
-            check = false;
-        }
-        
-        if(getQuestion[i].querySelector('.rightAnswer').value === '') {
-            console.log(`A resposta correta da pergunta ${i+1} não pode estar em branco`);
+        if (!isValidColor(getQuestion[i].querySelector('.questionBackground').value)) {
+            console.log(`A cor de fundo da pergunta ${i + 1} deve ser no formato "#FFFFFF`);
             check = false;
         }
 
-        if(getQuestion[i].querySelector('.wrongAnswer1').value === '' 
-        && getQuestion[i].querySelector('.wrongAnswer2').value === '' 
-        && getQuestion[i].querySelector('.wrongAnswer3').value === '') {
-            console.log(`Pelo menos uma resposta incorreta  da pergunta ${i+1} deve ser preenchida`);
-            check = false;
-        }
-          
-        if(!isValidHttpUrl(getQuestion[i].querySelector('.rightAnswerURL').value)) {
-            console.log(`A URL da imagem da resposta correta da pergunta ${i+1} é inválido`);
+        if (getQuestion[i].querySelector('.rightAnswer').value === '') {
+            console.log(`A resposta correta da pergunta ${i + 1} não pode estar em branco`);
             check = false;
         }
 
-        for(let j= 1; j <=3; j++) {
-            if(getQuestion[i].querySelector(`.wrongAnswer${j}`).value !== '' &&
+        if (getQuestion[i].querySelector('.wrongAnswer1').value === ''
+            && getQuestion[i].querySelector('.wrongAnswer2').value === ''
+            && getQuestion[i].querySelector('.wrongAnswer3').value === '') {
+            console.log(`Pelo menos uma resposta incorreta  da pergunta ${i + 1} deve ser preenchida`);
+            check = false;
+        }
+
+        if (!isValidHttpUrl(getQuestion[i].querySelector('.rightAnswerURL').value)) {
+            console.log(`A URL da imagem da resposta correta da pergunta ${i + 1} é inválido`);
+            check = false;
+        }
+
+        for (let j = 1; j <= 3; j++) {
+            if (getQuestion[i].querySelector(`.wrongAnswer${j}`).value !== '' &&
                 !isValidHttpUrl(getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value)) {
-                console.log(`A URL da imagem da resposta ${j} incorreta da pergunta ${i+1} é inválido`);
+                console.log(`A URL da imagem da resposta ${j} incorreta da pergunta ${i + 1} é inválido`);
                 check = false;
             } else if (getQuestion[i].querySelector(`.wrongAnswer${j}`).value === '' &&
-            getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value !== '') {
-                console.log(`A resposta incorreta ${j} da pergunta ${i+1} está em branco`);
+                getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value !== '') {
+                console.log(`A resposta incorreta ${j} da pergunta ${i + 1} está em branco`);
                 check = false;
             }
 
         }
-        
-        
+
+
     }
 
     if (check) {
@@ -366,8 +400,8 @@ function nextToMakeLevels() {
                 ]
             };
 
-            for(let j = 1; j <= 3; j++) {
-                if(getQuestion[i].querySelector(`.wrongAnswer${j}`).value !== ''){
+            for (let j = 1; j <= 3; j++) {
+                if (getQuestion[i].querySelector(`.wrongAnswer${j}`).value !== '') {
                     let wrongAnsw = {
                         text: getQuestion[i].querySelector(`.wrongAnswer${j}`).value,
                         image: getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value,
@@ -377,7 +411,7 @@ function nextToMakeLevels() {
                 }
             }
 
-           sendToServer.questions.push(question);
+            sendToServer.questions.push(question);
 
         }
 
@@ -387,7 +421,7 @@ function nextToMakeLevels() {
 }
 
 function renderLevels(levels) {
-    const levelsHTML =document.querySelector('.container4');
+    const levelsHTML = document.querySelector('.container4');
     levelsHTML.innerHTML = '';
     levelsHTML.innerHTML += `<h1>Agora, decida os níveis!</h1>`;
     for (let i = 0; i < levels; i++) {
@@ -426,54 +460,54 @@ function renderLevels(levels) {
 
     }
     levelsHTML.innerHTML += `<button onclick="nextToSucessQuizz()">Finalizar Quizz</button>`;
-    
+
 }
 
 function nextToSucessQuizz() {
     const getLevel = document.querySelectorAll('.level');
     let check = true;
     let isZero = false;
-    for(let i =0; i < getLevel.length; i++) {
-        if(getLevel[i].querySelector('.levelText').value.length < 10) {
+    for (let i = 0; i < getLevel.length; i++) {
+        if (getLevel[i].querySelector('.levelText').value.length < 10) {
             check = false;
-            console.log(`O título do nível ${i+1} precisa ter pelo menos 10 carácteres`);
+            console.log(`O título do nível ${i + 1} precisa ter pelo menos 10 carácteres`);
         }
 
-        if(isNaN(getLevel[i].querySelector('.levelmin').value) ||
-        parseInt(getLevel[i].querySelector('.levelmin').value) > 100 ||
-        parseInt(getLevel[i].querySelector('.levelmin').value) < 0) {
+        if (isNaN(getLevel[i].querySelector('.levelmin').value) ||
+            parseInt(getLevel[i].querySelector('.levelmin').value) > 100 ||
+            parseInt(getLevel[i].querySelector('.levelmin').value) < 0) {
             check = false;
-            console.log(`A % de acerto mínimo do nível ${i+1} precisa ser um número de 0 a 100`);
+            console.log(`A % de acerto mínimo do nível ${i + 1} precisa ser um número de 0 a 100`);
         }
 
-        if(!isValidHttpUrl(getLevel[i].querySelector('.levelURL').value)) {
+        if (!isValidHttpUrl(getLevel[i].querySelector('.levelURL').value)) {
             check = false;
-            console.log(`A URL da imagem do nível ${i+1} é inválido`);
+            console.log(`A URL da imagem do nível ${i + 1} é inválido`);
         }
 
-        if(getLevel[i].querySelector('.levelDesc').value.length < 30) {
+        if (getLevel[i].querySelector('.levelDesc').value.length < 30) {
             check = false;
-            console.log(`A descrição do nível ${i+1} precisa ter pelo menos 30 carácteres`);
+            console.log(`A descrição do nível ${i + 1} precisa ter pelo menos 30 carácteres`);
         }
 
-        if(parseInt(getLevel[i].querySelector('.levelmin').value) === 0) {
+        if (parseInt(getLevel[i].querySelector('.levelmin').value) === 0) {
             isZero = true;
-            
+
         }
-        
-        if(!isZero) {
+
+        if (!isZero) {
             check = false;
             console.log('É obrigatório existir pelo menos 1 nível cuja % de acerto mínima seja 0%');
         }
 
-        
+
     }
 
-    if(check){
+    if (check) {
         sendToServer.levels = [];
         let level;
-        for(let i =0 ; i < getLevel.length; i++) {
-            level = 
+        for (let i = 0; i < getLevel.length; i++) {
+            level =
             {
                 title: getLevel[i].querySelector('.levelText').value,
                 image: getLevel[i].querySelector('.levelURL').value,
@@ -490,67 +524,62 @@ function nextToSucessQuizz() {
 }
 
 function HandleSendDataToServer(data) {
-    const send = axios.post(`${API}`,data);
+    const send = axios.post(`${API}`, data);
     send.then(SaveMyIDQuizz);
 
 }
 
-function SaveMyIDQuizz (response){
+function SaveMyIDQuizz(response) {
 
-    let id,idS,idD;
-    
-    if(!localStorage.getItem("myID")) {
-        localStorage.setItem('myID','[]');
+    let id, idS, idD;
+
+    if (!localStorage.getItem("myID")) {
+        localStorage.setItem('myID', '[]');
     }
-   
+
     id = localStorage.getItem("myID");
     idD = JSON.parse(id);
     idD.push(response.data.id);
 
     idS = JSON.stringify(idD);
-    localStorage.setItem('myID',idS);
+    localStorage.setItem('myID', idS);
 
     nextToSucess();
 }
 
 
 
-function nextToSucess(){
+function nextToSucess() {
     const getMyQuizzes = JSON.parse(localStorage.getItem("myID"));
-    const getMyLastQuizz = getMyQuizzes[getMyQuizzes.length -1];
+    const getMyLastQuizz = getMyQuizzes[getMyQuizzes.length - 1];
 
     getMyQuizIdInServer(getMyLastQuizz);
 }
 
+
+let dataFromServer
 function getMyQuizIdInServer(idQuizz) {
     const getMyQuiz = axios.get(`${API}/${idQuizz}`);
     getMyQuiz.then(renderSucess);
 
-    function renderSucess(getData){
+    function renderSucess(getData) {
 
-        const dataFromServer = getData.data;
+        dataFromServer = getData.data;
         console.log(dataFromServer);
         const SucessHTML = document.querySelector('.container4')
         SucessHTML.innerHTML = '';
         SucessHTML.innerHTML += `<h1>Seu quizz está pronto!</h1>`;
-        SucessHTML.innerHTML+= 
-        `<div class="quizz">
+        SucessHTML.innerHTML +=
+            `<div class="quizz" id="${dataFromServer.id}" >
             <img src=${dataFromServer.image}>
             <h2>${dataFromServer.title}</h2>
         </div>
-        <button class="loadMyQuizz">Acessar Quizz</button>
+        <button onclick="mostrarQuizz()" class="loadMyQuizz">Acessar Quizz</button>
 
-        <button class="home">Voltar pra home</button>
+        <button onclick="voltarHome()" class="home">Voltar pra home</button>
         `;
-
-        document.querySelector('.home').
-        addEventListener('click', () => document.location.reload());
-
-        document.querySelector('.loadMyQuizz').
-        addEventListener('click', function() {
-            SucessHTML.innerHTML = '';
-
-            
-        });
     }
+}
+function mostrarQuizz() {
+    aparecerQuizz(dataFromServer);
 }
