@@ -1,5 +1,5 @@
 const API = `https://mock-api.driven.com.br/api/v6/buzzquizz/quizzes`;
-
+const parent = document.querySelector('.container1');
 //  TELA 1 - Lista de Quizzes
 
 let listaQuizzes = [];
@@ -28,18 +28,13 @@ function renderizarQuizzes(response) {
             quizzesUser.innerHTML += `<div class="quizz" id="${response.data[i].id}" onclick="aparecerQuizz(this)">
             <img src=${response.data[i].image}>
             <h2>${response.data[i].title}</h2>
-            <div>
-            <ion-icon name="trash-outline"></ion-icon>
-            </div>
+
         </div>`
             isFromUser = false;
         } else {
             quizzes.innerHTML += `<div class="quizz" id="${response.data[i].id}" onclick="aparecerQuizz(this)">
         <img src=${response.data[i].image}>
         <h2>${response.data[i].title}</h2>
-        <div>
-        <ion-icon name="trash-outline"></ion-icon>
-        </div>
     </div>`
         }
     }
@@ -69,38 +64,64 @@ function comparador() {
 let quizzSelect = [];
 let questoes = [];
 let InfosquizzSelect
-function aparecerQuizz(element) {
-    InfosquizzSelect = element
-    quizzSelect = listaQuizzes.filter(p => Number(p.id) === Number(element.id));
-    const tela1 = document.querySelector(".container1");
-    const tela2 = document.querySelector(".container2");
-    if (tela2.classList.contains("escondido")) {
-        tela1.classList.add("escondido");
-        tela2.classList.remove("escondido");
-    }
-    tela2.innerHTML = ""
-    tela2.innerHTML += `<div class="img-titulo">
-    <img src=${quizzSelect[0].image}>
-    <h2>${quizzSelect[0].title}</h2>
-    </div>`;
-    questoes = quizzSelect[0].questions;
-    for (let i = 0; i < questoes.length; i++) {
-        tela2.innerHTML += `<div class="pergunta">
-        <span style="background-color:${questoes[i].color};"><h3>${questoes[i].title}</h3></span>
-        <div></div>
-        </div>`
-        const DivPergunta = tela2.querySelector(".pergunta:last-child div");
-        let respostas = questoes[i].answers;
-        respostas.sort(comparador);
-        for (let j = 0; j < respostas.length; j++) {
-            DivPergunta.innerHTML += `<div class="resposta ${respostas[j].isCorrectAnswer}Select" onclick="corrigirResposta(this)">
-                <img src=${respostas[j].image}>
-                <p>${respostas[j].text}</p>
-                <div></div>
+function aparecerQuizz(element, showType = 0) {
+    if(showType === 0) {
+        InfosquizzSelect = element
+        quizzSelect = listaQuizzes.filter(p => Number(p.id) === Number(element.id));
+        parent.classList.remove('container1');
+        parent.classList.add('container2');
+        parent.innerHTML = "";
+        parent.innerHTML += `<div class="img-titulo">
+        <img src=${quizzSelect[0].image}>
+        <h2>${quizzSelect[0].title}</h2>
+        </div>`;
+        questoes = quizzSelect[0].questions;
+        for (let i = 0; i < questoes.length; i++) {
+            parent.innerHTML += `<div class="pergunta">
+            <span style="background-color:${questoes[i].color};"><h3>${questoes[i].title}</h3></span>
+            <div></div>
             </div>`
+            const DivPergunta = parent.querySelector(".pergunta:last-child div");
+            let respostas = questoes[i].answers;
+            respostas.sort(comparador);
+            for (let j = 0; j < respostas.length; j++) {
+                DivPergunta.innerHTML += `<div class="resposta ${respostas[j].isCorrectAnswer}Select" onclick="corrigirResposta(this)">
+                    <img src=${respostas[j].image}>
+                    <p>${respostas[j].text}</p>
+                    <div></div>
+                </div>`
+            }
         }
+        parent.querySelector(".img-titulo").scrollIntoView({ behavior: 'smooth' });
+    } else {
+        
+        InfosquizzSelect = element;
+        
+        parent.innerHTML = ""
+        parent.innerHTML += `<div class="img-titulo">
+        <img src=${InfosquizzSelect.image}>
+        <h2>${InfosquizzSelect.title}</h2>
+        </div>`;
+        questoes = InfosquizzSelect.questions;
+        for (let i = 0; i < questoes.length; i++) {
+            parent.innerHTML += `<div class="pergunta">
+            <span style="background-color:${questoes[i].color};"><h3>${questoes[i].title}</h3></span>
+            <div></div>
+            </div>`
+            const DivPergunta = parent.querySelector(".pergunta:last-child div");
+            let respostas = questoes[i].answers;
+            respostas.sort(comparador);
+            for (let j = 0; j < respostas.length; j++) {
+                DivPergunta.innerHTML += `<div class="resposta ${respostas[j].isCorrectAnswer}Select" onclick="corrigirResposta(this,1)">
+                    <img src=${respostas[j].image}>
+                    <p>${respostas[j].text}</p>
+                    <div></div>
+                </div>`
+            }
+        }
+        parent.querySelector(".img-titulo").scrollIntoView({ behavior: 'smooth' });
     }
-    tela2.querySelector(".img-titulo").scrollIntoView({ behavior: 'smooth' });
+    
 }
 
 // Ação de passar para a próxima pergunta
@@ -114,7 +135,7 @@ function ScrollPerguntaSeguinte(element) {
 
 // Verifica se a resposta selecionada é correta e passa para a próxima questão
 let contadorRespostas = 0
-function corrigirResposta(element) {
+function corrigirResposta(element, showType = 0) {
     let descricao = element.querySelector("p");
     if (descricao.classList.contains("selectCerto") ||
         descricao.classList.contains("selectErrado")) {
@@ -136,12 +157,18 @@ function corrigirResposta(element) {
         element.classList.add("RespSelecionada");
         setTimeout(function () { ScrollPerguntaSeguinte(element) }, 2000);
         if (contadorRespostas === questoes.length) {
-            setTimeout(mostrarResultado, 2000);
-            contadorRespostas = 0;
+            if(showType === 0){
+                setTimeout(mostrarResultado, 2000);
+                contadorRespostas = 0;
+            } else {
+                setTimeout(mostrarResultado(1), 2000);
+                contadorRespostas = 0;
+            }
+            
         }
     }
 }
-function mostrarResultado() {
+function mostrarResultado(showType = 0) {
     const respostas = document.querySelectorAll(".RespSelecionada");
     let total = respostas.length;
     let acertos = 0;
@@ -151,47 +178,93 @@ function mostrarResultado() {
             acertos++;
         }
     }
-    let niveis = quizzSelect[0].levels;
-    niveis.sort((a, b) => {
-        return a.minValue - b.minValue;
-    })
-    let acertosPorct = (acertos / total) * 100;
-    acertosPorct = Math.round(acertosPorct);
-    for (let i = (niveis.length - 1); i >= 0; i--) {
-        if (acertosPorct >= niveis[i].minValue) {
-            let tela2 = document.querySelector(".container2");
-            tela2.innerHTML += `<div class="resultadoQuizz">
-        <span style="background-color:#EC362D;"><h3>${acertosPorct}% de acerto: ${niveis[i].title}</h3></span>
-   <div>
-   <img src=${niveis[i].image}>
-   <p>${niveis[i].text}</p>
-   </div>
-   </div>
-   <button onclick="reiniciarQuizz()">Reiniciar Quizz</button>
-   <button class="home" onclick="voltarHome()">Voltar pra home</button>`
-            break
+    let niveis;
+    if(showType === 0) {
+        niveis = quizzSelect[0].levels;
+        niveis.sort((a, b) => {
+            return a.minValue - b.minValue;
+        })
+        let acertosPorct = (acertos / total) * 100;
+        acertosPorct = Math.round(acertosPorct);
+        for (let i = (niveis.length - 1); i >= 0; i--) {
+            if (acertosPorct >= niveis[i].minValue) {      
+                parent.innerHTML += `<div class="resultadoQuizz">
+            <span style="background-color:#EC362D;"><h3>${acertosPorct}% de acerto: ${niveis[i].title}</h3></span>
+       <div>
+       <img src=${niveis[i].image}>
+       <p>${niveis[i].text}</p>
+       </div>
+       </div>
+       <button onclick="reiniciarQuizz()">Reiniciar Quizz</button>
+       <button class="home" onclick="voltarHome()">Voltar pra home</button>`
+                break
+            }
         }
+        
+        acertos = 0;
+        document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
+    
+    } else {
+
+        niveis = dataFromServer.levels;
+        niveis.sort((a, b) => {
+            return a.minValue - b.minValue;
+        })
+        let acertosPorct = (acertos / total) * 100;
+        acertosPorct = Math.round(acertosPorct);
+        for (let i = (niveis.length - 1); i >= 0; i--) {
+            if (acertosPorct >= niveis[i].minValue) {      
+                parent.innerHTML += `<div class="resultadoQuizz">
+            <span style="background-color:#EC362D;"><h3>${acertosPorct}% de acerto: ${niveis[i].title}</h3></span>
+       <div>
+       <img src=${niveis[i].image}>
+       <p>${niveis[i].text}</p>
+       </div>
+       </div>
+       <button onclick="reiniciarQuizz(1)">Reiniciar Quizz</button>
+       <button class="home" onclick="voltarHome()">Voltar pra home</button>`
+                break
+            }
+        }
+        
+        acertos = 0;
+        document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
+    
+
     }
-    acertos = 0;
-    document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
+   
 }
 
 function voltarHome() {
     window.location.reload();
 }
 
-function reiniciarQuizz() {
-    aparecerQuizz(InfosquizzSelect);
+function reiniciarQuizz(typeQuiz = 0) {
+    if(typeQuiz === 0) {
+        aparecerQuizz(InfosquizzSelect);
+    } else {
+        aparecerQuizz(InfosquizzSelect,1);
+    }
+    
 }
 
 // TELA 3 - Criar Quizz
 
 
 function aparecerCriarQuizz() {
-    const tela1 = document.querySelector(".container1");
-    tela1.classList.add("escondido");
-    const tela3 = document.querySelector(".container3");
-    tela3.classList.remove("escondido");
+    parent.classList.remove('container1');
+    parent.classList.add('container3');
+    parent.innerHTML = "";
+    parent.innerHTML +=  `
+    <h1>Comece pelo começo</h1>
+        <div>
+            <input class="titulo" type="text" placeholder="Título do seu quizz">
+            <input class="imagem" type="url" placeholder="URL da imagem do seu quizz">
+            <input class="nPerguntas" type="text" placeholder="Quantidade de perguntas do quizz">
+            <input class="nNiveis" type="text" placeholder="Quantidade de níveis do quizz">
+        </div>
+    <button type="button" onclick="CriarPerguntas()">Prosseguir para criar perguntas</button>`;
+
 }
 
 let sendToServer = {
@@ -257,15 +330,21 @@ function CriarPerguntas() {
 
 // Exibir tela de criação de perguntas
 function showQuestions() {
-    const tela1 = document.querySelector(".container3");
-    tela1.classList.add("escondido");
-    const tela4 = document.querySelector(".container4");
-    tela4.classList.remove("escondido");
+    parent.classList.remove('container3');
+    parent.classList.add('container4');
+    parent.innerHTML = "";
+    parent.innerHTML +=  `
+    <h1>Crie suas perguntas</h1>
+        <div class="questions">
+            
+        </div>
+    <button onclick="nextToMakeLevels()">Prosseguir para criar níveis</button>
+    `;
 }
 
 
 function renderQuestions(nQuestions) {
-    const questionHTML = document.querySelector('.container4 div');
+    const questionHTML = parent.querySelector('.questions');
     questionHTML.innerHTML = '';
     for (let i = 0; i < nQuestions; i++) {
         if (i === 0) {
@@ -562,7 +641,7 @@ function nextToSucess() {
 }
 
 
-let dataFromServer
+let dataFromServer;
 function getMyQuizIdInServer(idQuizz) {
     const getMyQuiz = axios.get(`${API}/${idQuizz}`);
     getMyQuiz.then(renderSucess);
@@ -571,20 +650,33 @@ function getMyQuizIdInServer(idQuizz) {
 
         dataFromServer = getData.data;
         console.log(dataFromServer);
-        const SucessHTML = document.querySelector('.container4')
-        SucessHTML.innerHTML = '';
-        SucessHTML.innerHTML += `<h1>Seu quizz está pronto!</h1>`;
-        SucessHTML.innerHTML +=
+    
+        parent.innerHTML = '';
+        parent.innerHTML += `<h1>Seu quizz está pronto!</h1>`;
+        parent.innerHTML +=
             `<div class="quizz" id="${dataFromServer.id}" >
             <img src=${dataFromServer.image}>
             <h2>${dataFromServer.title}</h2>
         </div>
-        <button onclick="mostrarQuizz()" class="loadMyQuizz">Acessar Quizz</button>
+        <button onclick="mostrarQuizz(1)" class="loadMyQuizz">Acessar Quizz</button>
 
         <button onclick="voltarHome()" class="home">Voltar pra home</button>
         `;
     }
 }
-function mostrarQuizz() {
-    aparecerQuizz(dataFromServer);
+function mostrarQuizz(typeQuiz = 0) {
+    if(typeQuiz ===0 ) {
+        aparecerQuizz(dataFromServer);
+    } else {
+        aparecerQuizz(dataFromServer,1);
+    }
+}
+
+function debugAcessQuizz() {
+    //chamar no console
+    parent.innerHTML = "";
+    parent.classList.remove('container1');
+    parent.classList.add('container4');
+    // id do quizz que voce quer
+    getMyQuizIdInServer(29);
 }

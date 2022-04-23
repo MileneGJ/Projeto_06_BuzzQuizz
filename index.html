@@ -20,57 +20,33 @@
         BuzzQuizz
     </div>
 
-
-
     <div class="container1">
-        <div class="semQuizz escondido">
+        <div class="semQuizz">
             <p>Você não criou nenhum quizz ainda :(</p>
             <button onclick="aparecerCriarQuizz()">Criar Quizz</button>
         </div>
+
         <div class="comQuizz escondido">
             <div>
                 <h1>Seus Quizzes</h1>
                 <ion-icon name="add-circle" onclick="aparecerCriarQuizz()">></ion-icon>
             </div>
+            
             <div class="ListaQuizzesUser">
-
+                
             </div>
 
         </div>
+
         <h1>Todos os Quizzes</h1>
+
         <div class="ListaQuizzes">
-
+            
         </div>
     </div>
 
-    <div class="container2 escondido">
 
-    </div>
-
-
-    <div class="container3 escondido">
-        <h1>Comece pelo começo</h1>
-        <div>
-            <input class="titulo" type="text" placeholder="Título do seu quizz">
-            <input class="imagem" type="url" placeholder="URL da imagem do seu quizz">
-            <input class="nPerguntas" type="text" placeholder="Quantidade de perguntas do quizz">
-            <input class="nNiveis" type="text" placeholder="Quantidade de níveis do quizz">
-        </div>
-        <button type="button" onclick="CriarPerguntas()">Prosseguir para criar perguntas</button>
-    </div>
-
-    <div class="container4 escondido">
-        <h1>Crie suas perguntas</h1>
-        <div class="questions">
-
-        </div>
-        <button onclick="nextToMakeLevels()">Prosseguir para criar níveis</button>
-    </div>
-
-
-
-    <script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule="" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./script/script.js"></script>
 </body>
