@@ -3,57 +3,67 @@ const parent = document.querySelector('.container1');
 //  TELA 1 - Lista de Quizzes
 
 let listaQuizzes = [];
-let promise = axios.get(`${API}`);
-promise.then(renderizarQuizzes);
 
-const getMyQuizzesID = JSON.parse(localStorage.getItem("dataQuiz")).myID;
 
-function renderizarQuizzes(response) {
-    listaQuizzes = response.data;
-    let quizzes = document.querySelector(".ListaQuizzes");
-    let quizzesUser = document.querySelector(".ListaQuizzesUser");
-    let isFromUser
-    let ShowListUser
-    quizzes.innerHTML = "";
-    quizzesUser.innerHTML = "";
+function loadQuizzes(){
 
-    for (let i = 0; i < listaQuizzes.length; i++) {
-        getMyQuizzesID.map((x) => {
-            if (x === listaQuizzes[i].id) {
-                isFromUser = true;
-                ShowListUser = true;
-            }
-        });
-        
-        if (isFromUser) {
-            quizzesUser.innerHTML += `<div class="quizz" id="${listaQuizzes[i].id}" onclick="aparecerQuizz(this)">
+    const promise = axios.get(`${API}`);
+    promise.then(renderizarQuizzes);
+
+    function renderizarQuizzes(response) {
+
+        if (!localStorage.getItem("dataQuiz")) {
+            localStorage.setItem('dataQuiz', '{"myID":[],"myKey":[]}');
+        }
+        const getMyQuizzesID = JSON.parse(localStorage.getItem("dataQuiz")).myID;
+        listaQuizzes = response.data;
+        let quizzes = document.querySelector(".ListaQuizzes");
+        let quizzesUser = document.querySelector(".ListaQuizzesUser");
+        let isFromUser
+        let ShowListUser
+        quizzes.innerHTML = "";
+        quizzesUser.innerHTML = "";
+    
+        for (let i = 0; i < listaQuizzes.length; i++) {
+            getMyQuizzesID.map((x) => {
+                if (x === listaQuizzes[i].id) {
+                    isFromUser = true;
+                    ShowListUser = true;
+                }
+            });
+            
+            if (isFromUser) {
+                quizzesUser.innerHTML += `<div class="quizz" id="${listaQuizzes[i].id}" onclick="aparecerQuizz(this)">
+                <img src=${listaQuizzes[i].image}>
+                <h2>${listaQuizzes[i].title}</h2>
+    
+                <div onclick="event.stopPropagation();callConfirmDelete(this)">
+                <span class = "escondido">${listaQuizzes[i].id}</span>
+                <span class = "escondido">${listaQuizzes[i].title}</span>
+                <ion-icon name="trash-outline"></ion-icon>
+                </div>
+    
+            </div>`
+                isFromUser = false;
+            } else {
+                quizzes.innerHTML += `<div class="quizz" id="${listaQuizzes[i].id}" onclick="aparecerQuizz(this)">
             <img src=${listaQuizzes[i].image}>
             <h2>${listaQuizzes[i].title}</h2>
-
-            <div onclick="event.stopPropagation();callConfirmDelete(this)">
-            <span class = "escondido">${listaQuizzes[i].id}</span>
-            <span class = "escondido">${listaQuizzes[i].title}</span>
-            <ion-icon name="trash-outline"></ion-icon>
-            </div>
-
         </div>`
-            isFromUser = false;
+            }
+        }
+    
+        const semQuizz = document.querySelector(".semQuizz");
+        const comQuizz = document.querySelector(".comQuizz");
+        if (ShowListUser) {
+            comQuizz.classList.remove("escondido");
         } else {
-            quizzes.innerHTML += `<div class="quizz" id="${listaQuizzes[i].id}" onclick="aparecerQuizz(this)">
-        <img src=${listaQuizzes[i].image}>
-        <h2>${listaQuizzes[i].title}</h2>
-    </div>`
+            semQuizz.classList.remove("escondido");
         }
     }
-
-    const semQuizz = document.querySelector(".semQuizz");
-    const comQuizz = document.querySelector(".comQuizz");
-    if (ShowListUser) {
-        comQuizz.classList.remove("escondido");
-    } else {
-        semQuizz.classList.remove("escondido");
-    }
 }
+
+loadQuizzes();
 
 
 
@@ -556,7 +566,7 @@ function renderLevels(levels) {
 
 function nextToSucessQuizz() {
     const getLevel = document.querySelectorAll('.level');
-    let check = false;
+    let check = true;
     let isZero = false;
     for (let i = 0; i < getLevel.length; i++) {
         if (getLevel[i].querySelector('.levelText').value.length < 10) {
@@ -620,9 +630,7 @@ function HandleSendDataToServer(data) {
     function SaveMyQuizz(response) {
 
         let dataQuiz, dataQuizS, dataQuizD;
-        if (!localStorage.getItem("dataQuiz")) {
-            localStorage.setItem('dataQuiz', '{"myID":[],"myKey":[]}');
-        }
+        
     
         dataQuiz = localStorage.getItem("dataQuiz");
         dataQuizD = JSON.parse(dataQuiz);
@@ -643,7 +651,7 @@ function HandleSendDataToServer(data) {
 
 
 function nextToSucess() {
-    const getMyQuizzes = JSON.parse(localStorage.getItem("myID"));
+    const getMyQuizzes = JSON.parse(localStorage.getItem("dataQuiz")).myID;
     const getMyLastQuizz = getMyQuizzes[getMyQuizzes.length - 1];
 
     getMyQuizIdInServer(getMyLastQuizz);
@@ -687,21 +695,26 @@ function mostrarQuizz(typeQuiz = 0) {
 function callConfirmDelete(element) {
     
     const id =parseInt(element.querySelectorAll('span')[0].innerHTML);
+
     const titulo = element.querySelectorAll('span')[1].innerHTML;
-    let isConfirm = confirm(`Gostaria de deletar o quiz "${titulo}"`);
+    const isConfirm = confirm(`Gostaria de deletar o quiz "${titulo}"`);
+    const getKeyIndex = JSON.parse(localStorage.getItem("dataQuiz")).myID.indexOf(id);
+    const key = JSON.parse(localStorage.getItem("dataQuiz")).myKey[getKeyIndex];
 
     if(isConfirm){
-        console.log('yes');
+        sendDeleteRequest(id,key)
     } else {
         console.log('no');
     }
 
 }
 
-function sendDeleteRequest() {
-    //terminar a função ->pegar o valor da key no objeto
-    //armazenado no localstorage
-    const sendDelete = axios.delete('');
+function sendDeleteRequest(myId, myKey) {
+    //Só é possível deletar o quizz se houver uma chave
+    //correspondente ao mesmo no localstorage!
+    const sendHeader = {headers: { "Secret-Key": `${myKey}`}};
+    const sendDelete = axios.delete(`${API}/${myId}`,sendHeader);
+    sendDelete.then(loadQuizzes);
 }
 
 
