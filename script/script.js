@@ -6,7 +6,7 @@ let listaQuizzes = [];
 let promise = axios.get(`${API}`);
 promise.then(renderizarQuizzes);
 
-const getMyQuizzesID = JSON.parse(localStorage.getItem("myID"));
+const getMyQuizzesID = JSON.parse(localStorage.getItem("dataQuiz")).myID;
 
 function renderizarQuizzes(response) {
     listaQuizzes = response.data;
@@ -17,24 +17,31 @@ function renderizarQuizzes(response) {
     quizzes.innerHTML = "";
     quizzesUser.innerHTML = "";
 
-    for (let i = 0; i < response.data.length; i++) {
-        getMyQuizzesID.map(function (x) {
-            if (x === response.data[i].id) {
+    for (let i = 0; i < listaQuizzes.length; i++) {
+        getMyQuizzesID.map((x) => {
+            if (x === listaQuizzes[i].id) {
                 isFromUser = true;
                 ShowListUser = true;
             }
         });
+        
         if (isFromUser) {
-            quizzesUser.innerHTML += `<div class="quizz" id="${response.data[i].id}" onclick="aparecerQuizz(this)">
-            <img src=${response.data[i].image}>
-            <h2>${response.data[i].title}</h2>
+            quizzesUser.innerHTML += `<div class="quizz" id="${listaQuizzes[i].id}" onclick="aparecerQuizz(this)">
+            <img src=${listaQuizzes[i].image}>
+            <h2>${listaQuizzes[i].title}</h2>
+
+            <div onclick="event.stopPropagation();callConfirmDelete(this)">
+            <span class = "escondido">${listaQuizzes[i].id}</span>
+            <span class = "escondido">${listaQuizzes[i].title}</span>
+            <ion-icon name="trash-outline"></ion-icon>
+            </div>
 
         </div>`
             isFromUser = false;
         } else {
-            quizzes.innerHTML += `<div class="quizz" id="${response.data[i].id}" onclick="aparecerQuizz(this)">
-        <img src=${response.data[i].image}>
-        <h2>${response.data[i].title}</h2>
+            quizzes.innerHTML += `<div class="quizz" id="${listaQuizzes[i].id}" onclick="aparecerQuizz(this)">
+        <img src=${listaQuizzes[i].image}>
+        <h2>${listaQuizzes[i].title}</h2>
     </div>`
         }
     }
@@ -549,7 +556,7 @@ function renderLevels(levels) {
 
 function nextToSucessQuizz() {
     const getLevel = document.querySelectorAll('.level');
-    let check = true;
+    let check = false;
     let isZero = false;
     for (let i = 0; i < getLevel.length; i++) {
         if (getLevel[i].querySelector('.levelText').value.length < 10) {
@@ -558,12 +565,17 @@ function nextToSucessQuizz() {
         }
 
         if (isNaN(getLevel[i].querySelector('.levelmin').value) ||
+            getLevel[i].querySelector('.levelmin').value === '' ||
             parseInt(getLevel[i].querySelector('.levelmin').value) > 100 ||
             parseInt(getLevel[i].querySelector('.levelmin').value) < 0) {
             check = false;
             console.log(`A % de acerto mínimo do nível ${i + 1} precisa ser um número de 0 a 100`);
         }
 
+        if (parseInt(getLevel[i].querySelector('.levelmin').value) === 0) {
+            isZero = true;
+        } 
+            
         if (!isValidHttpUrl(getLevel[i].querySelector('.levelURL').value)) {
             check = false;
             console.log(`A URL da imagem do nível ${i + 1} é inválido`);
@@ -574,17 +586,11 @@ function nextToSucessQuizz() {
             console.log(`A descrição do nível ${i + 1} precisa ter pelo menos 30 carácteres`);
         }
 
-        if (parseInt(getLevel[i].querySelector('.levelmin').value) === 0) {
-            isZero = true;
+    }
 
-        }
-
-        if (!isZero) {
-            check = false;
-            console.log('É obrigatório existir pelo menos 1 nível cuja % de acerto mínima seja 0%');
-        }
-
-
+    if (!isZero) {
+        check = false;
+        console.log('É obrigatório existir pelo menos 1 nível cuja % de acerto mínima seja 0%');
     }
 
     if (check) {
@@ -609,27 +615,30 @@ function nextToSucessQuizz() {
 
 function HandleSendDataToServer(data) {
     const send = axios.post(`${API}`, data);
-    send.then(SaveMyIDQuizz);
+    send.then(SaveMyQuizz);
 
-}
+    function SaveMyQuizz(response) {
 
-function SaveMyIDQuizz(response) {
-
-    let id, idS, idD;
-
-    if (!localStorage.getItem("myID")) {
-        localStorage.setItem('myID', '[]');
+        let dataQuiz, dataQuizS, dataQuizD;
+        if (!localStorage.getItem("dataQuiz")) {
+            localStorage.setItem('dataQuiz', '{"myID":[],"myKey":[]}');
+        }
+    
+        dataQuiz = localStorage.getItem("dataQuiz");
+        dataQuizD = JSON.parse(dataQuiz);
+    
+        dataQuizD.myID.push(response.data.id);
+        dataQuizD.myKey.push(response.data.key);
+    
+        dataQuizS = JSON.stringify(dataQuizD);
+        localStorage.setItem('dataQuiz', dataQuizS);
+    
+        nextToSucess();
     }
 
-    id = localStorage.getItem("myID");
-    idD = JSON.parse(id);
-    idD.push(response.data.id);
-
-    idS = JSON.stringify(idD);
-    localStorage.setItem('myID', idS);
-
-    nextToSucess();
 }
+
+
 
 
 
@@ -672,11 +681,46 @@ function mostrarQuizz(typeQuiz = 0) {
     }
 }
 
-function debugAcessQuizz() {
+
+
+
+function callConfirmDelete(element) {
+    
+    const id =parseInt(element.querySelectorAll('span')[0].innerHTML);
+    const titulo = element.querySelectorAll('span')[1].innerHTML;
+    let isConfirm = confirm(`Gostaria de deletar o quiz "${titulo}"`);
+
+    if(isConfirm){
+        console.log('yes');
+    } else {
+        console.log('no');
+    }
+
+}
+
+function sendDeleteRequest() {
+    //terminar a função ->pegar o valor da key no objeto
+    //armazenado no localstorage
+    const sendDelete = axios.delete('');
+}
+
+
+
+
+function debugAcessQuizz(n) {
     //chamar no console
     parent.innerHTML = "";
     parent.classList.remove('container1');
     parent.classList.add('container4');
     // id do quizz que voce quer
-    getMyQuizIdInServer(29);
+    getMyQuizIdInServer(n);
+}
+
+function debugLevels() {
+    //chamar no console
+    parent.innerHTML = "";
+    parent.classList.remove('container1');
+    parent.classList.add('container4');
+    // id do quizz que voce quer
+    renderLevels(2);
 }
