@@ -1,5 +1,6 @@
 const API = `https://mock-api.driven.com.br/api/v6/buzzquizz/quizzes`;
 const parent = document.querySelector('.container1');
+const loadCircle = document.querySelector('.lds-ring').style;
 //  TELA 1 - Lista de Quizzes
 
 let listaQuizzes = [];
@@ -11,7 +12,30 @@ function loadQuizzes(){
     promise.then(renderizarQuizzes);
 
     function renderizarQuizzes(response) {
+        loadCircle.display = "none";
+        parent.innerHTML = `
+        <div class="semQuizz escondido">
+        <p>Você não criou nenhum quizz ainda :(</p>
+        <button onclick="aparecerCriarQuizz()">Criar Quizz</button>
+    </div>
 
+    <div class="comQuizz escondido">
+        <div>
+            <h1>Seus Quizzes</h1>
+            <ion-icon name="add-circle" onclick="aparecerCriarQuizz()">></ion-icon>
+        </div>
+        
+        <div class="ListaQuizzesUser">
+            
+        </div>
+
+    </div>
+
+    <h1>Todos os Quizzes</h1>
+
+    <div class="ListaQuizzes">
+        
+    </div>`;
         if (!localStorage.getItem("dataQuiz")) {
             localStorage.setItem('dataQuiz', '{"myID":[],"myKey":[]}');
         }
@@ -31,17 +55,28 @@ function loadQuizzes(){
                     ShowListUser = true;
                 }
             });
+            /*if(getMyQuizzesID.length !== 0){
+                isFromUser = true;
+                ShowListUser = true;
+            }*/
             
             if (isFromUser) {
                 quizzesUser.innerHTML += `<div class="quizz" id="${listaQuizzes[i].id}" onclick="aparecerQuizz(this)">
                 <img src=${listaQuizzes[i].image}>
                 <h2>${listaQuizzes[i].title}</h2>
-    
-                <div onclick="event.stopPropagation();callConfirmDelete(this)">
-                <span class = "escondido">${listaQuizzes[i].id}</span>
-                <span class = "escondido">${listaQuizzes[i].title}</span>
-                <ion-icon name="trash-outline"></ion-icon>
+                <div>                
+                <ion-icon name="create-outline" onclick="event.stopPropagation();callConfirmEdit(this)">
+                    <span class = "escondido">${listaQuizzes[i].id}</span>
+                    <span class = "escondido">${listaQuizzes[i].title}</span>
+                </ion-icon>
+
+                <ion-icon name="trash-outline" onclick="event.stopPropagation();callConfirmDelete(this)">
+                    <span class = "escondido">${listaQuizzes[i].id}</span>
+                    <span class = "escondido">${listaQuizzes[i].title}</span>
+                </ion-icon>
                 </div>
+
+                
     
             </div>`
                 isFromUser = false;
@@ -268,19 +303,33 @@ function reiniciarQuizz(typeQuiz = 0) {
 // TELA 3 - Criar Quizz
 
 
-function aparecerCriarQuizz() {
+function aparecerCriarQuizz(edit = false) {
     parent.classList.remove('container1');
     parent.classList.add('container3');
     parent.innerHTML = "";
-    parent.innerHTML +=  `
-    <h1>Comece pelo começo</h1>
-        <div>
-            <input class="titulo" type="text" placeholder="Título do seu quizz">
-            <input class="imagem" type="url" placeholder="URL da imagem do seu quizz">
-            <input class="nPerguntas" type="text" placeholder="Quantidade de perguntas do quizz">
-            <input class="nNiveis" type="text" placeholder="Quantidade de níveis do quizz">
-        </div>
-    <button type="button" onclick="CriarPerguntas()">Prosseguir para criar perguntas</button>`;
+    if(edit) {
+
+        parent.innerHTML +=  `
+        <h1>Comece pelo começo (edição)</h1>
+            <div>
+                <input class="titulo" type="text" value = "${dataFromServer.title}" placeholder="Título do seu quizz">
+                <input class="imagem" type="url" value = "${dataFromServer.image}"placeholder="URL da imagem do seu quizz">
+                <input class="nPerguntas" type="text" value = "${dataFromServer.questions.length}" placeholder="Quantidade de perguntas do quizz">
+                <input class="nNiveis" type="text" value = "${dataFromServer.levels.length}" placeholder="Quantidade de níveis do quizz">
+            </div>
+        <button type="button" onclick="CriarPerguntas(true)">Prosseguir para editar perguntas</button>`;
+    } else {
+        parent.innerHTML +=  `
+        <h1>Comece pelo começo</h1>
+            <div>
+                <input class="titulo" type="text" placeholder="Título do seu quizz">
+                <input class="imagem" type="url" placeholder="URL da imagem do seu quizz">
+                <input class="nPerguntas" type="text" placeholder="Quantidade de perguntas do quizz">
+                <input class="nNiveis" type="text" placeholder="Quantidade de níveis do quizz">
+            </div>
+        <button type="button" onclick="CriarPerguntas()">Prosseguir para criar perguntas</button>`;
+    }
+    
 
 }
 
@@ -329,96 +378,232 @@ function VerificarInputsIniciais(titulo, imagem, nPerguntas, nNiveis) {
 
 // Validação completa para iniciar a criação de perguntas
 let nNiveis;
-function CriarPerguntas() {
+function CriarPerguntas(edit = false) {
     const titulo = document.querySelector(".container3 .titulo").value;
     const imagem = document.querySelector(".container3 .imagem").value;
     const nPerguntas = document.querySelector(".container3 .nPerguntas").value;
     nNiveis = document.querySelector(".container3 .nNiveis").value;
-
     let isValidInputs = VerificarInputsIniciais(titulo, imagem, nPerguntas, nNiveis);  //Usando a função acima, aparece um único alerta de erro nos inputs
+
 
     if (isValidInputs) {
         sendToServer.title = titulo;
         sendToServer.image = imagem
-        showQuestions();
-        renderQuestions(nPerguntas);
+        if(edit) {
+            showQuestions(true);
+            renderQuestions(nPerguntas,true);
+        } else {
+            showQuestions();
+            renderQuestions(nPerguntas);
+        }
+        
     }
 }
 
 // Exibir tela de criação de perguntas
-function showQuestions() {
+function showQuestions(edit = false) {
     parent.classList.remove('container3');
     parent.classList.add('container4');
     parent.innerHTML = "";
-    parent.innerHTML +=  `
-    <h1>Crie suas perguntas</h1>
-        <div class="questions">
-            
-        </div>
-    <button onclick="nextToMakeLevels()">Prosseguir para criar níveis</button>
-    `;
+    if(edit) {
+        parent.innerHTML +=  `
+        <h1>Crie suas perguntas (edição)</h1>
+            <div class="questions">
+                
+            </div>
+        <button onclick="nextToMakeLevels(true)">Prosseguir para editar níveis</button>
+        `;
+
+    } else {
+        parent.innerHTML +=  `
+        <h1>Crie suas perguntas</h1>
+            <div class="questions">
+                
+            </div>
+        <button onclick="nextToMakeLevels()">Prosseguir para criar níveis</button>
+        `;
+    }
+    
 }
 
 
-function renderQuestions(nQuestions) {
+function renderQuestions(nQuestions, edit = false) {
     const questionHTML = parent.querySelector('.questions');
     questionHTML.innerHTML = '';
     for (let i = 0; i < nQuestions; i++) {
-        if (i === 0) {
-            questionHTML.innerHTML += `
-            <div class="question">
-                <h1>Pergunta ${i + 1}</h1>
-                <input class="questionText" type="text" placeholder="Texto da pergunta">
-                <input class="questionBackground" type="text" placeholder="Cor de fundo da pergunta">
-                
-                <h1>Resposta correta</h1>
-
-                <input class="rightAnswer" type="text" placeholder="Resposta correta">
-                <input class="rightAnswerURL" type="url" placeholder="URL da imagem">
-
-                <h1>Respostas incorretas</h1>
-
-                <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
-                <input class="wrongAnswerURL1" type="url" placeholder="URL da imagem 1">
-
-                <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
-                <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
-
-                <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
-                <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
-            </div>
-            `;
-        } else {
-            questionHTML.innerHTML += `
-            <div class="question" onclick="callNextQuestion(this)">
-                <div class = "editForm" >
+        if(edit) {
+            let answSize = dataFromServer.questions[i].answers.length;
+            if (i === 0) {
+                questionHTML.innerHTML += `
+                <div class="question">
                     <h1>Pergunta ${i + 1}</h1>
-                    <ion-icon name="create-outline"></ion-icon>
+                    <input class="questionText" type="text" value= "${dataFromServer.questions[i].title}" placeholder="Texto da pergunta">
+                    <input class="questionBackground" type="text" value= "${dataFromServer.questions[i].color}" placeholder="Cor de fundo da pergunta">
+                    
+                    <h1>Resposta correta</h1>
+    
+                    <input class="rightAnswer" value = "${dataFromServer.questions[i].answers[0].text}" type="text" placeholder="Resposta correta">
+                    <input class="rightAnswerURL" value = "${dataFromServer.questions[i].answers[0].image}" type="url" placeholder="URL da imagem">
+    
+                    <h1>Respostas incorretas</h1>
                 </div>
-                <div class="form escondido">
-                <input class="questionText" type="text" placeholder="Texto da pergunta">
-                <input class="questionBackground" type="text" placeholder="Cor de fundo da pergunta">
+                `;
+                if(answSize === 2) {
+                    document.querySelector('.question').innerHTML += `
+                    <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
+    
+                    <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                    <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
+    
+                    <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    `;
+                } else if(answSize === 3) {
+                    document.querySelector('.question').innerHTML += `
+                    <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
+    
+                    <input class="wrongAnswer2" type="text" value = "${dataFromServer.questions[i].answers[2].text}" placeholder="Resposta incorreta 2">
+                    <input class="wrongAnswerURL2" type="url" value = "${dataFromServer.questions[i].answers[2].image}" placeholder="URL da imagem 2">
+    
+                    <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    `;
+
+                } else if(answSize === 4) {
+                    document.querySelector('.question').innerHTML += `
+                    <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
+    
+                    <input class="wrongAnswer2" type="text" value = "${dataFromServer.questions[i].answers[2].text}" placeholder="Resposta incorreta 2">
+                    <input class="wrongAnswerURL2" type="url" value = "${dataFromServer.questions[i].answers[2].image}" placeholder="URL da imagem 2">
+    
+                    <input class="wrongAnswer3" type="text" value = "${dataFromServer.questions[i].answers[3].text}" placeholder="Resposta incorreta 3">
+                    <input class="wrongAnswerURL3" type="url" value = "${dataFromServer.questions[i].answers[3].image}" placeholder="URL da imagem 3">
+                    `;
+                }
+            } else {
+                questionHTML.innerHTML += `
+                <div class="question" onclick="callNextQuestion(this)">
+                    <div class = "editForm" >
+                        <h1>Pergunta ${i + 1}</h1>
+                        <ion-icon name="create-outline"></ion-icon>
+                    </div>
+                    <div class="form escondido">
+                    <input class="questionText" type="text" value= "${dataFromServer.questions[i].title}" placeholder="Texto da pergunta">
+                    <input class="questionBackground" type="text" value= "${dataFromServer.questions[i].color}" placeholder="Cor de fundo da pergunta">
+                    
+                    <h1>Resposta correta</h1>
+    
+                    <input class="rightAnswer" value = "${dataFromServer.questions[i].answers[0].text}" type="text" placeholder="Resposta correta">
+                    <input class="rightAnswerURL" value = "${dataFromServer.questions[i].answers[0].image}" type="url" placeholder="URL da imagem">
+    
+                    <h1>Respostas incorretas</h1>
+    
+                    
+                    </div>
+                </div>
+                `;
                 
-                <h1>Resposta correta</h1>
+                if(answSize === 2) {
+                    document.querySelectorAll(".form")[document.querySelectorAll(".form").length -1].innerHTML += `
+                    <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
+    
+                    <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                    <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
+    
+                    <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    `;
+                } else if(answSize === 3) {
+                    document.querySelectorAll(".form")[document.querySelectorAll(".form").length -1].innerHTML += `
+                    <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
+    
+                    <input class="wrongAnswer2" type="text" value = "${dataFromServer.questions[i].answers[2].text}" placeholder="Resposta incorreta 2">
+                    <input class="wrongAnswerURL2" type="url" value = "${dataFromServer.questions[i].answers[2].image}" placeholder="URL da imagem 2">
+    
+                    <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    `;
 
-                <input class="rightAnswer" type="text" placeholder="Resposta correta">
-                <input class="rightAnswerURL" type="url" placeholder="URL da imagem">
+                } else if(answSize === 4) {
+                    document.querySelectorAll(".form")[document.querySelectorAll(".form").length -1].innerHTML += `
+                    <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
+    
+                    <input class="wrongAnswer2" type="text" value = "${dataFromServer.questions[i].answers[2].text}" placeholder="Resposta incorreta 2">
+                    <input class="wrongAnswerURL2" type="url" value = "${dataFromServer.questions[i].answers[2].image}" placeholder="URL da imagem 2">
+    
+                    <input class="wrongAnswer3" type="text" value = "${dataFromServer.questions[i].answers[3].text}" placeholder="Resposta incorreta 3">
+                    <input class="wrongAnswerURL3" type="url" value = "${dataFromServer.questions[i].answers[3].image}" placeholder="URL da imagem 3">
+                    `;
+                }
+    
+            }
 
-                <h1>Respostas incorretas</h1>
+            
 
-                <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
-                <input class="wrongAnswerURL1" type="url" placeholder="URL da imagem 1">
-
-                <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
-                <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
-
-                <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
-                <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+        } else {
+            if (i === 0) {
+                questionHTML.innerHTML += `
+                <div class="question">
+                    <h1>Pergunta ${i + 1}</h1>
+                    <input class="questionText" type="text" placeholder="Texto da pergunta">
+                    <input class="questionBackground" type="text" placeholder="Cor de fundo da pergunta">
+                    
+                    <h1>Resposta correta</h1>
+    
+                    <input class="rightAnswer" type="text" placeholder="Resposta correta">
+                    <input class="rightAnswerURL" type="url" placeholder="URL da imagem">
+    
+                    <h1>Respostas incorretas</h1>
+    
+                    <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
+                    <input class="wrongAnswerURL1" type="url" placeholder="URL da imagem 1">
+    
+                    <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                    <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
+    
+                    <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
                 </div>
-            </div>
-            `;
-
+                `;
+            } else {
+                questionHTML.innerHTML += `
+                <div class="question" onclick="callNextQuestion(this)">
+                    <div class = "editForm" >
+                        <h1>Pergunta ${i + 1}</h1>
+                        <ion-icon name="create-outline"></ion-icon>
+                    </div>
+                    <div class="form escondido">
+                    <input class="questionText" type="text" placeholder="Texto da pergunta">
+                    <input class="questionBackground" type="text" placeholder="Cor de fundo da pergunta">
+                    
+                    <h1>Resposta correta</h1>
+    
+                    <input class="rightAnswer" type="text" placeholder="Resposta correta">
+                    <input class="rightAnswerURL" type="url" placeholder="URL da imagem">
+    
+                    <h1>Respostas incorretas</h1>
+    
+                    <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
+                    <input class="wrongAnswerURL1" type="url" placeholder="URL da imagem 1">
+    
+                    <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                    <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
+    
+                    <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    </div>
+                </div>
+                `;
+    
+            }
         }
+        
 
     }
 
@@ -436,7 +621,7 @@ function callNextQuestion(element) {
     element.querySelector('.form').classList.remove('escondido');
 
 }
-function nextToMakeLevels() {
+function nextToMakeLevels(edit = false) {
     const getQuestion = document.querySelectorAll('.question');
     let check = true;
     for (let i = 0; i < getQuestion.length; i++) {
@@ -515,56 +700,102 @@ function nextToMakeLevels() {
             sendToServer.questions.push(question);
 
         }
-
-        renderLevels(nNiveis);
+        if(edit) {
+            renderLevels(nNiveis, true);
+        } else {
+            renderLevels(nNiveis);
+        }
+        
 
     }
 }
 
-function renderLevels(levels) {
+function renderLevels(levels, edit = false) {
     const levelsHTML = document.querySelector('.container4');
     levelsHTML.innerHTML = '';
     levelsHTML.innerHTML += `<h1>Agora, decida os níveis!</h1>`;
     for (let i = 0; i < levels; i++) {
-        if (i === 0) {
-            levelsHTML.innerHTML += `
-            <div class="level">
-                <h1>Nível ${i + 1}</h1>
-                <input class="levelText" type="text" placeholder="Título do nível">
-                <input class="levelmin" type="text" placeholder="% de acerto mínima">
-                
-                <input class="levelURL" type="url" placeholder="URL da imagem do nível">
-
-                <input class="levelDesc" type="text" placeholder="Descrição do nível">
-  
-            </div>
-            `;
-        } else {
-            levelsHTML.innerHTML += `
-            <div class="level" onclick="callNextQuestion(this)">
-                <div class = "editForm" >
+        if(edit) {
+            if (i === 0) {
+                levelsHTML.innerHTML += `
+                <div class="level">
                     <h1>Nível ${i + 1}</h1>
-                    <ion-icon name="create-outline"></ion-icon>
+                    <input class="levelText" type="text" value="${dataFromServer.levels[i].title}" placeholder="Título do nível">
+                    <input class="levelmin" type="text" value="${dataFromServer.levels[i].minValue}" placeholder="% de acerto mínima">
+                    
+                    <input class="levelURL" type="url" value="${dataFromServer.levels[i].image}" placeholder="URL da imagem do nível">
+    
+                    <input class="levelDesc" type="text" value="${dataFromServer.levels[i].text}" placeholder="Descrição do nível">
+      
                 </div>
-                <div class="form escondido">
+                `;
+            } else {
+                levelsHTML.innerHTML += `
+                <div class="level" onclick="callNextQuestion(this)">
+                    <div class = "editForm" >
+                        <h1>Nível ${i + 1}</h1>
+                        <ion-icon name="create-outline"></ion-icon>
+                    </div>
+                    <div class="form escondido">
+                        <input class="levelText" type="text" value="${dataFromServer.levels[i].title}" placeholder="Título do nível">
+                        <input class="levelmin" type="text" value="${dataFromServer.levels[i].minValue}" placeholder="% de acerto mínima">
+                    
+                        <input class="levelURL" type="url" value="${dataFromServer.levels[i].image}" placeholder="URL da imagem do nível">
+    
+                        <input class="levelDesc" type="text" value="${dataFromServer.levels[i].text}" placeholder="Descrição do nível">
+                    </div>
+                </div>
+                `;
+    
+            }
+
+        } else {
+            if (i === 0) {
+                levelsHTML.innerHTML += `
+                <div class="level">
+                    <h1>Nível ${i + 1}</h1>
                     <input class="levelText" type="text" placeholder="Título do nível">
                     <input class="levelmin" type="text" placeholder="% de acerto mínima">
                     
                     <input class="levelURL" type="url" placeholder="URL da imagem do nível">
-
+    
                     <input class="levelDesc" type="text" placeholder="Descrição do nível">
+      
                 </div>
-            </div>
-            `;
-
+                `;
+            } else {
+                levelsHTML.innerHTML += `
+                <div class="level" onclick="callNextQuestion(this)">
+                    <div class = "editForm" >
+                        <h1>Nível ${i + 1}</h1>
+                        <ion-icon name="create-outline"></ion-icon>
+                    </div>
+                    <div class="form escondido">
+                        <input class="levelText" type="text" placeholder="Título do nível">
+                        <input class="levelmin" type="text" placeholder="% de acerto mínima">
+                        
+                        <input class="levelURL" type="url" placeholder="URL da imagem do nível">
+    
+                        <input class="levelDesc" type="text" placeholder="Descrição do nível">
+                    </div>
+                </div>
+                `;
+    
+            }
         }
+       
 
     }
-    levelsHTML.innerHTML += `<button onclick="nextToSucessQuizz()">Finalizar Quizz</button>`;
+    if(edit) {
+        levelsHTML.innerHTML += `<button onclick="nextToSucessQuizz(true)">Editar Quizz</button>`;
+    } else {
+        levelsHTML.innerHTML += `<button onclick="nextToSucessQuizz()">Finalizar Quizz</button>`;
+    }
+   
 
 }
 
-function nextToSucessQuizz() {
+function nextToSucessQuizz(edit = false) {
     const getLevel = document.querySelectorAll('.level');
     let check = true;
     let isZero = false;
@@ -617,8 +848,12 @@ function nextToSucessQuizz() {
 
             sendToServer.levels.push(level);
         }
-
-        HandleSendDataToServer(sendToServer);
+        if (edit) {
+            SaveEditedQuizz(dataFromServer.id);
+        } else {
+            HandleSendDataToServer(sendToServer);
+        }
+        
 
     }
 }
@@ -659,7 +894,7 @@ function nextToSucess() {
 
 
 let dataFromServer;
-function getMyQuizIdInServer(idQuizz) {
+function getMyQuizIdInServer(idQuizz, edit = false) {
     const getMyQuiz = axios.get(`${API}/${idQuizz}`);
     getMyQuiz.then(renderSucess);
 
@@ -667,18 +902,23 @@ function getMyQuizIdInServer(idQuizz) {
 
         dataFromServer = getData.data;
         console.log(dataFromServer);
-    
-        parent.innerHTML = '';
-        parent.innerHTML += `<h1>Seu quizz está pronto!</h1>`;
-        parent.innerHTML +=
+        if(edit){
+            aparecerCriarQuizz(true);
+
+        } else {
+            parent.innerHTML = '';
+            parent.innerHTML += `<h1>Seu quizz está pronto!</h1>`;
+            parent.innerHTML +=
             `<div class="quizz" id="${dataFromServer.id}" >
             <img src=${dataFromServer.image}>
             <h2>${dataFromServer.title}</h2>
-        </div>
-        <button onclick="mostrarQuizz(1)" class="loadMyQuizz">Acessar Quizz</button>
+            </div>
+            <button onclick="mostrarQuizz(1)" class="loadMyQuizz">Acessar Quizz</button>
 
-        <button onclick="voltarHome()" class="home">Voltar pra home</button>
-        `;
+            <button onclick="voltarHome()" class="home">Voltar pra home</button>
+            `;
+        }
+        
     }
 }
 function mostrarQuizz(typeQuiz = 0) {
@@ -702,7 +942,7 @@ function callConfirmDelete(element) {
     const key = JSON.parse(localStorage.getItem("dataQuiz")).myKey[getKeyIndex];
 
     if(isConfirm){
-        sendDeleteRequest(id,key)
+        sendDeleteRequest(id,key);
     } else {
         console.log('no');
     }
@@ -717,7 +957,25 @@ function sendDeleteRequest(myId, myKey) {
     sendDelete.then(loadQuizzes);
 }
 
+function callConfirmEdit(element) {
+    const id =parseInt(element.querySelectorAll('span')[0].innerHTML);
+    const titulo = element.querySelectorAll('span')[1].innerHTML;
+    const isConfirm = confirm(`Gostaria de editar o quiz "${titulo}"`);
 
+    if(isConfirm){
+        getMyQuizIdInServer(id,true);
+    }
+
+}
+
+function SaveEditedQuizz(myID) {
+    const getKeyIndex = JSON.parse(localStorage.getItem("dataQuiz")).myID.indexOf(myID);
+    const key = JSON.parse(localStorage.getItem("dataQuiz")).myKey[getKeyIndex];
+    const sendHeader = {headers: { "Secret-Key": `${key}`}};
+    const sendDelete = axios.put(`${API}/${myID}`,sendToServer,sendHeader);
+    sendDelete.then(nextToSucess);
+
+}
 
 
 function debugAcessQuizz(n) {
@@ -737,3 +995,4 @@ function debugLevels() {
     // id do quizz que voce quer
     renderLevels(2);
 }
+
