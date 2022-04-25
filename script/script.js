@@ -1,12 +1,12 @@
 const API = `https://mock-api.driven.com.br/api/v6/buzzquizz/quizzes`;
 const parent = document.querySelector('.container1');
 const loadCircle = document.querySelector('.lds-ring').style;
+
+
+
 //  TELA 1 - Lista de Quizzes
 
-let listaQuizzes = [];
-
-
-function loadQuizzes(){
+function loadQuizzes() {
 
     const promise = axios.get(`${API}`);
     promise.then(renderizarQuizzes);
@@ -40,54 +40,48 @@ function loadQuizzes(){
             localStorage.setItem('dataQuiz', '{"myID":[],"myKey":[]}');
         }
         const getMyQuizzesID = JSON.parse(localStorage.getItem("dataQuiz")).myID;
-        listaQuizzes = response.data;
+        listaTodosQuizzes = response.data;
         let quizzes = document.querySelector(".ListaQuizzes");
         let quizzesUser = document.querySelector(".ListaQuizzesUser");
         let isFromUser
         let ShowListUser
         quizzes.innerHTML = "";
         quizzesUser.innerHTML = "";
-    
-        for (let i = 0; i < listaQuizzes.length; i++) {
+
+        for (let i = 0; i < listaTodosQuizzes.length; i++) {
             getMyQuizzesID.map((x) => {
-                if (x === listaQuizzes[i].id) {
+                if (x === listaTodosQuizzes[i].id) {
                     isFromUser = true;
                     ShowListUser = true;
                 }
             });
-            /*if(getMyQuizzesID.length !== 0){
-                isFromUser = true;
-                ShowListUser = true;
-            }*/
-            
+
             if (isFromUser) {
-                quizzesUser.innerHTML += `<div class="quizz" id="${listaQuizzes[i].id}" onclick="aparecerQuizz(this)">
-                <img src=${listaQuizzes[i].image}>
-                <h2>${listaQuizzes[i].title}</h2>
+                quizzesUser.innerHTML += `<div class="quizz" id="${listaTodosQuizzes[i].id}" onclick="aparecerQuizz(this)">
+                <img src=${listaTodosQuizzes[i].image}>
+                <h2>${listaTodosQuizzes[i].title}</h2>
                 <div>                
                 <ion-icon name="create-outline" onclick="event.stopPropagation();callConfirmEdit(this)">
-                    <span class = "escondido">${listaQuizzes[i].id}</span>
-                    <span class = "escondido">${listaQuizzes[i].title}</span>
+                    <span class = "escondido">${listaTodosQuizzes[i].id}</span>
+                    <span class = "escondido">${listaTodosQuizzes[i].title}</span>
                 </ion-icon>
 
                 <ion-icon name="trash-outline" onclick="event.stopPropagation();callConfirmDelete(this)">
-                    <span class = "escondido">${listaQuizzes[i].id}</span>
-                    <span class = "escondido">${listaQuizzes[i].title}</span>
+                    <span class = "escondido">${listaTodosQuizzes[i].id}</span>
+                    <span class = "escondido">${listaTodosQuizzes[i].title}</span>
                 </ion-icon>
                 </div>
 
-                
-    
             </div>`
                 isFromUser = false;
             } else {
-                quizzes.innerHTML += `<div class="quizz" id="${listaQuizzes[i].id}" onclick="aparecerQuizz(this)">
-            <img src=${listaQuizzes[i].image}>
-            <h2>${listaQuizzes[i].title}</h2>
+                quizzes.innerHTML += `<div class="quizz" id="${listaTodosQuizzes[i].id}" onclick="aparecerQuizz(this)">
+            <img src=${listaTodosQuizzes[i].image}>
+            <h2>${listaTodosQuizzes[i].title}</h2>
         </div>`
             }
         }
-    
+
         const semQuizz = document.querySelector(".semQuizz");
         const comQuizz = document.querySelector(".comQuizz");
         if (ShowListUser) {
@@ -96,6 +90,7 @@ function loadQuizzes(){
             semQuizz.classList.remove("escondido");
         }
     }
+    document.querySelector("header").scrollIntoView();
 }
 
 loadQuizzes();
@@ -115,41 +110,18 @@ function comparador() {
 //Usar infos do quizz selecionado para criar tela 2
 let quizzSelect = [];
 let questoes = [];
-let InfosquizzSelect
+let InfosquizzSelect;
+
 function aparecerQuizz(element, showType = 0) {
-    if(showType === 0) {
-        InfosquizzSelect = element
-        quizzSelect = listaQuizzes.filter(p => Number(p.id) === Number(element.id));
+    InfosquizzSelect = element;
+    parent.innerHTML = "";
+    if (showType === 0) {
         parent.classList.remove('container1');
         parent.classList.add('container2');
-        parent.innerHTML = "";
-        parent.innerHTML += `<div class="img-titulo">
-        <img src=${quizzSelect[0].image}>
-        <h2>${quizzSelect[0].title}</h2>
-        </div>`;
-        questoes = quizzSelect[0].questions;
-        for (let i = 0; i < questoes.length; i++) {
-            parent.innerHTML += `<div class="pergunta">
-            <span style="background-color:${questoes[i].color};"><h3>${questoes[i].title}</h3></span>
-            <div></div>
-            </div>`
-            const DivPergunta = parent.querySelector(".pergunta:last-child div");
-            let respostas = questoes[i].answers;
-            respostas.sort(comparador);
-            for (let j = 0; j < respostas.length; j++) {
-                DivPergunta.innerHTML += `<div class="resposta ${respostas[j].isCorrectAnswer}Select" onclick="corrigirResposta(this)">
-                    <img src=${respostas[j].image}>
-                    <p>${respostas[j].text}</p>
-                    <div></div>
-                </div>`
-            }
-        }
-        parent.querySelector(".img-titulo").scrollIntoView({ behavior: 'smooth' });
+        const promise = axios.get(`${API}`);
+        loadCircle.display = "inline-block";
+        promise.then(exibirQuizzSelect);
     } else {
-        
-        InfosquizzSelect = element;
-        
-        parent.innerHTML = ""
         parent.innerHTML += `<div class="img-titulo">
         <img src=${InfosquizzSelect.image}>
         <h2>${InfosquizzSelect.title}</h2>
@@ -173,7 +145,38 @@ function aparecerQuizz(element, showType = 0) {
         }
         parent.querySelector(".img-titulo").scrollIntoView({ behavior: 'smooth' });
     }
-    
+}
+
+function exibirQuizzSelect(response) {
+    quizzSelect = response.data.filter(p => Number(p.id) === Number(InfosquizzSelect.id));
+    let tela2 = document.querySelector(".container2")
+    loadCircle.display = "none";
+    tela2.innerHTML += `<div class="img-titulo">
+    <img src=${quizzSelect[0].image}>
+    <h2>${quizzSelect[0].title}</h2>
+    </div>`;
+    questoes = quizzSelect[0].questions;
+    for (let i = 0; i < questoes.length; i++) {
+        tela2.innerHTML += `<div class="pergunta">
+        <span style="background-color:${questoes[i].color};"><h3>${questoes[i].title}</h3></span>
+        <div></div>
+        </div>`
+        const DivPergunta = tela2.querySelector(".pergunta:last-child div");
+        let respostas = questoes[i].answers;
+        respostas.sort(comparador);
+        for (let j = 0; j < respostas.length; j++) {
+            DivPergunta.innerHTML += `<div class="resposta ${respostas[j].isCorrectAnswer}Select" onclick="corrigirResposta(this)">
+                <img src=${respostas[j].image}>
+                <p>${respostas[j].text}</p>
+                <div></div>
+            </div>`
+        }
+    }
+    tela2.querySelector(".img-titulo").scrollIntoView({ behavior: 'smooth' });
+}
+
+function exibirQuizzCriado() {
+
 }
 
 // Ação de passar para a próxima pergunta
@@ -209,14 +212,14 @@ function corrigirResposta(element, showType = 0) {
         element.classList.add("RespSelecionada");
         setTimeout(function () { ScrollPerguntaSeguinte(element) }, 2000);
         if (contadorRespostas === questoes.length) {
-            if(showType === 0){
+            if (showType === 0) {
                 setTimeout(mostrarResultado, 2000);
                 contadorRespostas = 0;
             } else {
                 setTimeout(mostrarResultado(1), 2000);
                 contadorRespostas = 0;
             }
-            
+
         }
     }
 }
@@ -231,7 +234,7 @@ function mostrarResultado(showType = 0) {
         }
     }
     let niveis;
-    if(showType === 0) {
+    if (showType === 0) {
         niveis = quizzSelect[0].levels;
         niveis.sort((a, b) => {
             return a.minValue - b.minValue;
@@ -239,7 +242,7 @@ function mostrarResultado(showType = 0) {
         let acertosPorct = (acertos / total) * 100;
         acertosPorct = Math.round(acertosPorct);
         for (let i = (niveis.length - 1); i >= 0; i--) {
-            if (acertosPorct >= niveis[i].minValue) {      
+            if (acertosPorct >= niveis[i].minValue) {
                 parent.innerHTML += `<div class="resultadoQuizz">
             <span style="background-color:#EC362D;"><h3>${acertosPorct}% de acerto: ${niveis[i].title}</h3></span>
        <div>
@@ -252,10 +255,10 @@ function mostrarResultado(showType = 0) {
                 break
             }
         }
-        
+
         acertos = 0;
         document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
-    
+
     } else {
 
         niveis = dataFromServer.levels;
@@ -265,7 +268,7 @@ function mostrarResultado(showType = 0) {
         let acertosPorct = (acertos / total) * 100;
         acertosPorct = Math.round(acertosPorct);
         for (let i = (niveis.length - 1); i >= 0; i--) {
-            if (acertosPorct >= niveis[i].minValue) {      
+            if (acertosPorct >= niveis[i].minValue) {
                 parent.innerHTML += `<div class="resultadoQuizz">
             <span style="background-color:#EC362D;"><h3>${acertosPorct}% de acerto: ${niveis[i].title}</h3></span>
        <div>
@@ -278,13 +281,13 @@ function mostrarResultado(showType = 0) {
                 break
             }
         }
-        
+
         acertos = 0;
         document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
-    
+
 
     }
-   
+
 }
 
 function voltarHome() {
@@ -292,12 +295,12 @@ function voltarHome() {
 }
 
 function reiniciarQuizz(typeQuiz = 0) {
-    if(typeQuiz === 0) {
+    if (typeQuiz === 0) {
         aparecerQuizz(InfosquizzSelect);
     } else {
-        aparecerQuizz(InfosquizzSelect,1);
+        aparecerQuizz(InfosquizzSelect, 1);
     }
-    
+
 }
 
 // TELA 3 - Criar Quizz
@@ -307,9 +310,9 @@ function aparecerCriarQuizz(edit = false) {
     parent.classList.remove('container1');
     parent.classList.add('container3');
     parent.innerHTML = "";
-    if(edit) {
+    if (edit) {
 
-        parent.innerHTML +=  `
+        parent.innerHTML += `
         <h1>Comece pelo começo (edição)</h1>
             <div>
                 <input class="titulo" type="text" value = "${dataFromServer.title}" placeholder="Título do seu quizz">
@@ -319,7 +322,7 @@ function aparecerCriarQuizz(edit = false) {
             </div>
         <button type="button" onclick="CriarPerguntas(true)">Prosseguir para editar perguntas</button>`;
     } else {
-        parent.innerHTML +=  `
+        parent.innerHTML += `
         <h1>Comece pelo começo</h1>
             <div>
                 <input class="titulo" type="text" placeholder="Título do seu quizz">
@@ -329,7 +332,7 @@ function aparecerCriarQuizz(edit = false) {
             </div>
         <button type="button" onclick="CriarPerguntas()">Prosseguir para criar perguntas</button>`;
     }
-    
+
 
 }
 
@@ -352,9 +355,10 @@ function isValidHttpUrl(string) {
 
 // Verificar requisitos dos inputs iniciais e retornar mensagem de erro quando necessário
 function VerificarInputsIniciais(titulo, imagem, nPerguntas, nNiveis) {
-    let msgAlerta = "";
-    let alertar = false
     if (titulo.length < 22 || titulo.length > 65) {
+        let input = document.querySelector(".container3 .titulo");
+        input.classList.add("fillerrado");
+
         msgAlerta += "Titulo deve conter entre 20 e 65 caracteres\n";
         alertar = true;
     }
@@ -389,14 +393,14 @@ function CriarPerguntas(edit = false) {
     if (isValidInputs) {
         sendToServer.title = titulo;
         sendToServer.image = imagem
-        if(edit) {
+        if (edit) {
             showQuestions(true);
-            renderQuestions(nPerguntas,true);
+            renderQuestions(nPerguntas, true);
         } else {
             showQuestions();
             renderQuestions(nPerguntas);
         }
-        
+
     }
 }
 
@@ -405,8 +409,8 @@ function showQuestions(edit = false) {
     parent.classList.remove('container3');
     parent.classList.add('container4');
     parent.innerHTML = "";
-    if(edit) {
-        parent.innerHTML +=  `
+    if (edit) {
+        parent.innerHTML += `
         <h1>Crie suas perguntas (edição)</h1>
             <div class="questions">
                 
@@ -415,7 +419,7 @@ function showQuestions(edit = false) {
         `;
 
     } else {
-        parent.innerHTML +=  `
+        parent.innerHTML += `
         <h1>Crie suas perguntas</h1>
             <div class="questions">
                 
@@ -423,7 +427,7 @@ function showQuestions(edit = false) {
         <button onclick="nextToMakeLevels()">Prosseguir para criar níveis</button>
         `;
     }
-    
+
 }
 
 
@@ -431,7 +435,7 @@ function renderQuestions(nQuestions, edit = false) {
     const questionHTML = parent.querySelector('.questions');
     questionHTML.innerHTML = '';
     for (let i = 0; i < nQuestions; i++) {
-        if(edit) {
+        if (edit) {
             let answSize = dataFromServer.questions[i].answers.length;
             if (i === 0) {
                 questionHTML.innerHTML += `
@@ -448,7 +452,7 @@ function renderQuestions(nQuestions, edit = false) {
                     <h1>Respostas incorretas</h1>
                 </div>
                 `;
-                if(answSize === 2) {
+                if (answSize === 2) {
                     document.querySelector('.question').innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
@@ -459,7 +463,7 @@ function renderQuestions(nQuestions, edit = false) {
                     <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
                     `;
-                } else if(answSize === 3) {
+                } else if (answSize === 3) {
                     document.querySelector('.question').innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
@@ -471,7 +475,7 @@ function renderQuestions(nQuestions, edit = false) {
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
                     `;
 
-                } else if(answSize === 4) {
+                } else if (answSize === 4) {
                     document.querySelector('.question').innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
@@ -505,9 +509,9 @@ function renderQuestions(nQuestions, edit = false) {
                     </div>
                 </div>
                 `;
-                
-                if(answSize === 2) {
-                    document.querySelectorAll(".form")[document.querySelectorAll(".form").length -1].innerHTML += `
+
+                if (answSize === 2) {
+                    document.querySelectorAll(".form")[document.querySelectorAll(".form").length - 1].innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
     
@@ -517,8 +521,8 @@ function renderQuestions(nQuestions, edit = false) {
                     <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
                     `;
-                } else if(answSize === 3) {
-                    document.querySelectorAll(".form")[document.querySelectorAll(".form").length -1].innerHTML += `
+                } else if (answSize === 3) {
+                    document.querySelectorAll(".form")[document.querySelectorAll(".form").length - 1].innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
     
@@ -529,8 +533,8 @@ function renderQuestions(nQuestions, edit = false) {
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
                     `;
 
-                } else if(answSize === 4) {
-                    document.querySelectorAll(".form")[document.querySelectorAll(".form").length -1].innerHTML += `
+                } else if (answSize === 4) {
+                    document.querySelectorAll(".form")[document.querySelectorAll(".form").length - 1].innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
     
@@ -541,10 +545,10 @@ function renderQuestions(nQuestions, edit = false) {
                     <input class="wrongAnswerURL3" type="url" value = "${dataFromServer.questions[i].answers[3].image}" placeholder="URL da imagem 3">
                     `;
                 }
-    
+
             }
 
-            
+
 
         } else {
             if (i === 0) {
@@ -600,10 +604,10 @@ function renderQuestions(nQuestions, edit = false) {
                     </div>
                 </div>
                 `;
-    
+
             }
         }
-        
+
 
     }
 
@@ -700,12 +704,12 @@ function nextToMakeLevels(edit = false) {
             sendToServer.questions.push(question);
 
         }
-        if(edit) {
+        if (edit) {
             renderLevels(nNiveis, true);
         } else {
             renderLevels(nNiveis);
         }
-        
+
 
     }
 }
@@ -713,10 +717,10 @@ function nextToMakeLevels(edit = false) {
 function renderLevels(levels, edit = false) {
     const levelsHTML = document.querySelector('.container4');
     levelsHTML.innerHTML = '';
-    levelsHTML.innerHTML += `<h1>Agora, decida os níveis!</h1>`;
     for (let i = 0; i < levels; i++) {
-        if(edit) {
+        if (edit) {
             if (i === 0) {
+                levelsHTML.innerHTML += `<h1>Agora, decida os níveis! (edição) </h1>`;
                 levelsHTML.innerHTML += `
                 <div class="level">
                     <h1>Nível ${i + 1}</h1>
@@ -746,10 +750,11 @@ function renderLevels(levels, edit = false) {
                     </div>
                 </div>
                 `;
-    
+
             }
 
         } else {
+            levelsHTML.innerHTML += `<h1>Agora, decida os níveis!</h1>`;
             if (i === 0) {
                 levelsHTML.innerHTML += `
                 <div class="level">
@@ -780,18 +785,18 @@ function renderLevels(levels, edit = false) {
                     </div>
                 </div>
                 `;
-    
+
             }
         }
-       
+
 
     }
-    if(edit) {
+    if (edit) {
         levelsHTML.innerHTML += `<button onclick="nextToSucessQuizz(true)">Editar Quizz</button>`;
     } else {
         levelsHTML.innerHTML += `<button onclick="nextToSucessQuizz()">Finalizar Quizz</button>`;
     }
-   
+
 
 }
 
@@ -815,8 +820,8 @@ function nextToSucessQuizz(edit = false) {
 
         if (parseInt(getLevel[i].querySelector('.levelmin').value) === 0) {
             isZero = true;
-        } 
-            
+        }
+
         if (!isValidHttpUrl(getLevel[i].querySelector('.levelURL').value)) {
             check = false;
             console.log(`A URL da imagem do nível ${i + 1} é inválido`);
@@ -853,29 +858,31 @@ function nextToSucessQuizz(edit = false) {
         } else {
             HandleSendDataToServer(sendToServer);
         }
-        
+
 
     }
 }
 
 function HandleSendDataToServer(data) {
     const send = axios.post(`${API}`, data);
+    parent.innerHTML = '';
+    loadCircle.display = "inline-block";
     send.then(SaveMyQuizz);
 
     function SaveMyQuizz(response) {
 
         let dataQuiz, dataQuizS, dataQuizD;
-        
-    
+
+
         dataQuiz = localStorage.getItem("dataQuiz");
         dataQuizD = JSON.parse(dataQuiz);
-    
+
         dataQuizD.myID.push(response.data.id);
         dataQuizD.myKey.push(response.data.key);
-    
+
         dataQuizS = JSON.stringify(dataQuizD);
         localStorage.setItem('dataQuiz', dataQuizS);
-    
+
         nextToSucess();
     }
 
@@ -902,14 +909,15 @@ function getMyQuizIdInServer(idQuizz, edit = false) {
 
         dataFromServer = getData.data;
         console.log(dataFromServer);
-        if(edit){
+        if (edit) {
             aparecerCriarQuizz(true);
 
         } else {
+            loadCircle.display = "none";
             parent.innerHTML = '';
             parent.innerHTML += `<h1>Seu quizz está pronto!</h1>`;
             parent.innerHTML +=
-            `<div class="quizz" id="${dataFromServer.id}" >
+                `<div class="quizz" id="${dataFromServer.id}" >
             <img src=${dataFromServer.image}>
             <h2>${dataFromServer.title}</h2>
             </div>
@@ -918,14 +926,14 @@ function getMyQuizIdInServer(idQuizz, edit = false) {
             <button onclick="voltarHome()" class="home">Voltar pra home</button>
             `;
         }
-        
+
     }
 }
 function mostrarQuizz(typeQuiz = 0) {
-    if(typeQuiz ===0 ) {
+    if (typeQuiz === 0) {
         aparecerQuizz(dataFromServer);
     } else {
-        aparecerQuizz(dataFromServer,1);
+        aparecerQuizz(dataFromServer, 1);
     }
 }
 
@@ -933,16 +941,16 @@ function mostrarQuizz(typeQuiz = 0) {
 
 
 function callConfirmDelete(element) {
-    
-    const id =parseInt(element.querySelectorAll('span')[0].innerHTML);
+
+    const id = parseInt(element.querySelectorAll('span')[0].innerHTML);
 
     const titulo = element.querySelectorAll('span')[1].innerHTML;
-    const isConfirm = confirm(`Gostaria de deletar o quiz "${titulo}"`);
+    const isConfirm = confirm(`Gostaria de deletar o quiz "${titulo}"?`);
     const getKeyIndex = JSON.parse(localStorage.getItem("dataQuiz")).myID.indexOf(id);
     const key = JSON.parse(localStorage.getItem("dataQuiz")).myKey[getKeyIndex];
 
-    if(isConfirm){
-        sendDeleteRequest(id,key);
+    if (isConfirm) {
+        sendDeleteRequest(id, key);
     } else {
         console.log('no');
     }
@@ -952,18 +960,20 @@ function callConfirmDelete(element) {
 function sendDeleteRequest(myId, myKey) {
     //Só é possível deletar o quizz se houver uma chave
     //correspondente ao mesmo no localstorage!
-    const sendHeader = {headers: { "Secret-Key": `${myKey}`}};
-    const sendDelete = axios.delete(`${API}/${myId}`,sendHeader);
+    const sendHeader = { headers: { "Secret-Key": `${myKey}` } };
+    const sendDelete = axios.delete(`${API}/${myId}`, sendHeader);
+    parent.innerHTML = '';
+    loadCircle.display = "inline-block";
     sendDelete.then(loadQuizzes);
 }
 
 function callConfirmEdit(element) {
-    const id =parseInt(element.querySelectorAll('span')[0].innerHTML);
+    const id = parseInt(element.querySelectorAll('span')[0].innerHTML);
     const titulo = element.querySelectorAll('span')[1].innerHTML;
-    const isConfirm = confirm(`Gostaria de editar o quiz "${titulo}"`);
+    const isConfirm = confirm(`Gostaria de editar o quiz "${titulo}"?`);
 
-    if(isConfirm){
-        getMyQuizIdInServer(id,true);
+    if (isConfirm) {
+        getMyQuizIdInServer(id, true);
     }
 
 }
@@ -971,8 +981,9 @@ function callConfirmEdit(element) {
 function SaveEditedQuizz(myID) {
     const getKeyIndex = JSON.parse(localStorage.getItem("dataQuiz")).myID.indexOf(myID);
     const key = JSON.parse(localStorage.getItem("dataQuiz")).myKey[getKeyIndex];
-    const sendHeader = {headers: { "Secret-Key": `${key}`}};
-    const sendDelete = axios.put(`${API}/${myID}`,sendToServer,sendHeader);
+    const sendHeader = { headers: { "Secret-Key": `${key}` } };
+    const sendDelete = axios.put(`${API}/${myID}`, sendToServer, sendHeader);
+    loadCircle.display = "inline-block";
     sendDelete.then(nextToSucess);
 
 }

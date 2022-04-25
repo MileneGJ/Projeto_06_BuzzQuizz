@@ -20,13 +20,13 @@ main {
     display: none;
 }
 
-.esbranquicado{
-    background-color: rgba(255,255,255,0.7);
-    width:100%;
-    height:100%;
-    position:absolute;
-    top:0;
-    left:0;
+.esbranquicado {
+    background-color: rgba(255, 255, 255, 0.7);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 header {
@@ -44,7 +44,7 @@ header {
 
 .container1,
 .container2,
-.container3, 
+.container3,
 .container4 {
     display: flex;
     flex-direction: column;
@@ -53,14 +53,14 @@ header {
 }
 
 
-h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hierarquias? Minhas outras hs não seguem nenhuma dessas configs*/
+h1 {
     width: 100%;
     font-size: 20px;
     color: #000000;
     font-weight: bold;
     text-align: left;
     margin-top: 40px;
-    margin-bottom:10px;    
+    margin-bottom: 10px;
 }
 
 /*  AJUSTES GERAIS   */
@@ -70,13 +70,13 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
 /*   TELA 1 - Lista dos Quizzes   */
 
 .container1>div,
-.container1> h1 {
-    width: 66%;
+.container1>h1 {
+    width: 70%;
 }
 
 .semQuizz {
     height: 180px;
-    margin-bottom:40px;
+    margin-bottom: 40px;
     border: dashed 2px #D4D4D4;
     border-radius: 4px;
     display: flex;
@@ -103,45 +103,47 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     border-radius: 50px;
     border: dashed 2px #EC362D;
 }
-.comQuizz > div{
-    display:flex;
+
+.comQuizz>div:first-child {
+    display: flex;
     align-items: center;
     margin-bottom: 10px;
 }
-.comQuizz ion-icon{
-    margin:0 16px;
+
+.comQuizz ion-icon {
+    margin: 0 16px;
     font-size: 30px;
-    color:#EC362D;
+    color: #EC362D;
 }
-.comQuizz h1{
-    margin:0;
-    width:auto;
+
+.comQuizz h1 {
+    margin: 0;
+    width: auto;
 }
+
 .ListaQuizzes,
 .ListaQuizzesUser {
     display: flex;
     flex-wrap: wrap;
 }
+
 .quizz,
 .quizz img,
-.quizz h2{
-    width: 340px;
+.quizz h2 {
+    width: 330px;
     height: 180px;
     box-sizing: border-box;
+    border-radius: 4px;
     overflow: hidden;
 }
 
-.quizz{
+.quizz {
     position: relative;
-    margin:0 16px 16px 0;  
-}
-.quizz img{
-    border-radius: 4px;
+    margin: 0 16px 16px 0;
 }
 
 .quizz h2 {
     background: linear-gradient(transparent 40%, #000000 95%);
-    border-radius: 4px;
     color: #FFFFFF;
     font-size: 20px;
     position: absolute;
@@ -151,21 +153,23 @@ h1 { /* Antes:",h2,h3,h4" Não poderíamos colocar essas configs dentro das hier
     align-items: flex-end;
     padding: 15px;
 }
-.quizz div{
+
+.quizz div {
     height: 60px;
     width: 30px;
     background-color: #EC362D;
-    display:  flex;
+    display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
     border-radius: 4px 0 0 4px;
-    position:absolute;
-    top:10px;
-    right:0;
+    position: absolute;
+    top: 10px;
+    right: 0;
 }
-.quizz ion-icon{
-    color:#FFFFFF;   
+
+.quizz ion-icon {
+    color: #FFFFFF;
     font-size: 20px;
 }
 
@@ -210,7 +214,9 @@ ion-icon:hover {
     background: rgba(0, 0, 0, 0.6);
     overflow: hidden;
 }
-.pergunta, .resultadoQuizz {
+
+.pergunta,
+.resultadoQuizz {
     background-color: #FFFFFF;
     width: 60%;
     box-shadow: 0 0 5px rgba(150, 150, 150, 0.1);
@@ -219,13 +225,15 @@ ion-icon:hover {
     margin-top: 50px;
 
 }
-.resultadoQuizz{
-    padding:15px;
+
+.resultadoQuizz {
+    padding: 15px;
     margin-bottom: 60px;
 }
 
-.pergunta span, .resultadoQuizz span {
-    width:100%;
+.pergunta span,
+.resultadoQuizz span {
+    width: 100%;
     height: 138px;
     display: flex;
     align-items: center;
@@ -233,31 +241,37 @@ ion-icon:hover {
     padding: 0 10px;
     box-sizing: border-box;
 }
-.pergunta h3, .resultadoQuizz h3 {
-    width:100%;
+
+.pergunta h3,
+.resultadoQuizz h3 {
+    width: 100%;
     text-align: center;
     color: #FFFFFF;
     font-size: 23px;
     font-weight: bold;
     word-wrap: break-word;
 }
-.pergunta>div {
+
+.pergunta>div,
+.resultadoQuizz>div {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
 }
-.resposta{
-    margin-top:20px;
-    width:48%;
+
+.resposta {
+    margin-top: 20px;
+    width: 48%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    position:relative;
+    position: relative;
     overflow: hidden;
 }
+
 .resposta img {
-    width:100%;
-    height:180px;
+    width: 100%;
+    height: 180px;
     object-fit: cover;
 }
 
@@ -270,43 +284,49 @@ ion-icon:hover {
     line-height: 24px;
     margin: 15px 0;
 }
-.resposta .selectCerto{
-    color:#009C22;
-}
-.resposta .selectErrado{
-    color:#FF0B0B;
+
+.resposta .selectCerto {
+    color: #009C22;
 }
 
-.resultadoQuizz span{
-    height:100px;
+.resposta .selectErrado {
+    color: #FF0B0B;
+}
+
+.resultadoQuizz span {
+    height: 100px;
     margin-bottom: 20px;
 }
 
-.resultadoQuizz >div{
-    display: flex;
-    justify-content: space-between;
+.resultadoQuizz>div {
+    flex-wrap: nowrap;
 }
-.resultadoQuizz img{
-    width:50%;
-    height:280px;
+
+.resultadoQuizz img {
+    width: 50%;
+    height: 280px;
     object-fit: cover;
 }
-.resultadoQuizz p{
+
+.resultadoQuizz p {
     font-size: 20px;
     font-weight: bold;
-    color:#484848;
-    width:48%;
-    margin-left:20px;
+    color: #484848;
+    width: 48%;
+    margin-left: 20px;
     word-wrap: break-word;
 }
-.container2 button{
-    width:260px;
+
+.container2 button {
+    width: 260px;
 }
-.container2 .home, .container4 .home{
+
+.container2 .home,
+.container4 .home {
     background-color: transparent;
-    border:none;
+    border: none;
     color: #818181;
-    margin:15px 0 100px 0;
+    margin: 10px 0 100px 0;
 }
 
 /*  TELA 2 - Abrindo um Quizz  */
@@ -316,19 +336,22 @@ ion-icon:hover {
 
 
 /*  TELA 3 - Criando um Quizz  */
-  
-.container3 > h1, .container4 > h1 {
+
+.container3>h1,
+.container4>h1 {
     margin-top: 0;
     font-size: 24px;
     text-align: center;
 }
 
-.questions  h1,
-.container4 h1{
+.questions h1,
+.container4 h1 {
     margin: 30px 0 10px 0;
 }
 
-.container3>div{
+.container3>div,
+.question,
+.level {
     background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
@@ -338,22 +361,15 @@ ion-icon:hover {
     width: 600px;
     min-height: 256px;
     box-sizing: border-box;
-    margin:30px;
+    margin: 30px;
     box-shadow: 0 0 4px 2px rgba(150, 150, 150, 0.1);
 }
 
 .question,
 .level {
-    background-color: #FFFFFF;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     padding: 0 20px;
-    width: 600px;
-    box-sizing: border-box;
-    margin:50px 0;
-    box-shadow: 0 0 4px 2px rgba(150, 150, 150, 0.1);
+    margin: 50px 0;
+    min-height: auto;
 }
 
 .editForm {
@@ -363,11 +379,11 @@ ion-icon:hover {
     align-items: center;
 }
 
-.editForm > ion-icon {
+.editForm>ion-icon {
     font-size: 20px;
 }
 
-.editForm h1{
+.editForm h1 {
     margin: 15px 0;
 }
 
@@ -376,47 +392,58 @@ ion-icon:hover {
     width: 100%;
     height: 46px;
     font-size: 20px;
-    color:#BABABA;
+    color: #BABABA;
     text-indent: 24px;
     font-style: italic;
-    font-family: 'Roboto',sans-serif;
-    margin:5px 0;
-    border:solid 1px #D1D1D1;
+    font-family: 'Roboto', sans-serif;
+    margin: 5px 0;
+    border: solid 1px #D1D1D1;
     border-radius: 4px;
 }
 
 .container2 button,
 .container3 button,
-.container4 button{
+.container4 button {
     background-color: #EC362D;
     font-size: 20px;
     color: #FFF5F4;
     text-align: center;
-    height:54px;
+    height: 54px;
     border-radius: 14px;
-    border:none;
+    border: none;
 }
 
 .container3 button,
-.container4 button{
-width:370px;
-}
-.container4 .loadMyQuizz{
-    width:220px;
-}
-.container2 button,
-.container3 button{
-    margin-top:50px;
+.container4 button {
+    width: 370px;
 }
 
-.container4 .quizz{
-    width:500px;
-    height:270px;
-    margin:50px 0;
+.container4 .loadMyQuizz {
+    width: 220px;
+    margin-bottom:0;
 }
-.container4 .quizz img,.container4 .quizz h2{
-    width:500px;
-    height:270px;
+
+.container2 button,
+.container3 button {
+    margin-top: 50px;
+}
+
+.container4 button {
+    margin-bottom: 30px;
+}
+
+.container4 .quizz,
+.container4 .quizz img,
+.container4 .quizz h2 {
+    width: 500px;
+    height: 270px;
+}
+
+.container4 .quizz {
+    margin: 50px 0;
+}
+.container3 .fillerrado, .container4 .fillerrado{
+    background-color: #FFE9E9;
 }
 /*  TELA 3 - Criando um Quizz  */
 
@@ -425,16 +452,30 @@ width:370px;
 /* Loading */
 .lds-ring {
     display: inline-block;
+
     position: absolute;
-    top: 20%;
-    left: 40%;
-    width: 80px;
-    height: 80px;
-  }
-  .lds-ring div {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #FAFAFA;
+
+}
+
+.lds-ring h4 {
+    position: relative;
+    top: 45%;
+    text-align: center;
+    color: #EC362D;
+    font-size: 25px;
+}
+
+.lds-ring div {
     box-sizing: border-box;
     display: block;
     position: absolute;
+    top: 30%;
+    left: 47.5%;
     width: 64px;
     height: 64px;
     margin: 8px;
@@ -442,44 +483,51 @@ width:370px;
     border-radius: 50%;
     animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     border-color: red transparent transparent transparent;
-  }
-  .lds-ring div:nth-child(1) {
+}
+
+.lds-ring div:nth-child(1) {
     animation-delay: -0.45s;
-  }
-  .lds-ring div:nth-child(2) {
+}
+
+.lds-ring div:nth-child(2) {
     animation-delay: -0.3s;
-  }
-  .lds-ring div:nth-child(3) {
+}
+
+.lds-ring div:nth-child(3) {
     animation-delay: -0.15s;
-  }
-  @keyframes lds-ring {
+}
+
+@keyframes lds-ring {
     0% {
-      transform: rotate(0deg);
+        transform: rotate(0deg);
     }
+
     100% {
-      transform: rotate(360deg);
+        transform: rotate(360deg);
     }
-  }
-  
-  
+}
+
+
 
 @media (max-width:1100px) {
     h1 {
         margin-top: 40px;
     }
 
+
+    /*   TELA 1 - LISTA DE QUIZZES    */
     .container1,
     .container3 {
-        
         margin-top: 40px;
     }
 
-    .container1>div, 
-    .container1 >h1 {
-        width: 100%;
-        
+    .container1>div,
+    .container1>h1 {
+        width: 90%;
     }
-    .ListaQuizzes {
+
+    .ListaQuizzes,
+    .ListaQuizzesUser {
         display: flex;
         justify-content: center;
     }
@@ -487,55 +535,92 @@ width:370px;
     .comQuizz>div:first-child {
         justify-content: space-between;
     }
-    .pergunta, .resultadoQuizz{
-        width:100%;
+
+    /*   TELA 1 - LISTA DE QUIZZES    */
+
+
+
+    /*   TELA 2 - EXIBIR UM QUIZZ    */
+    .pergunta,
+    .resultadoQuizz {
+        width: 100%;
         margin-top: 30px;
     }
-    .img-titulo h2{
-        font-size:20px;
-    }
-    .img-titulo,.img-titulo h2{
-        height:140px;
-    }
-    .pergunta span,.resultadoQuizz span{
-        height:90px;
-    }
-    .pergunta h3, .resultadoQuizz h3{
+
+    .img-titulo h2 {
         font-size: 20px;
     }
-    .resposta img{
-        height:110px;
+
+    .img-titulo,
+    .img-titulo h2 {
+        height: 140px;
     }
-    .resposta p{
+
+    .pergunta span,
+    .resultadoQuizz span {
+        height: 90px;
+    }
+
+    .pergunta h3,
+    .resultadoQuizz h3 {
+        font-size: 20px;
+    }
+
+    .resposta img {
+        height: 110px;
+    }
+
+    .resposta p {
         font-size: 13px;
     }
-    .resultadoQuizz p{
+
+    .resultadoQuizz p {
         font-size: 17px;
     }
-    .container2 button{
+
+    .container2 button {
         font-size: 18px;
     }
-    .container3>div {
+
+    /*   TELA 2 - EXIBIR UM QUIZZ    */
+
+
+
+
+    /*   TELA 3 - CRIAR UM QUIZZ    */
+    .container3>div,
+    .question,
+    .level {
         width: 100%;
     }
-    .container3 h1{
+
+    .container3 h1 {
         font-size: 20px;
     }
-    .container3 button{
-        font-size:18px;
+
+    .container3 button {
+        font-size: 18px;
         margin-top: 0;
     }
-    .questions{
-        width:100%;
+
+    .questions {
+        width: 100%;
     }
-    .question{
-        width:100%;
+
+    .question {
+        width: 100%;
     }
-    .container4 .quizz,.container4 .quizz img,.container4 .quizz h2{
+
+    .container4 .quizz,
+    .container4 .quizz img,
+    .container4 .quizz h2 {
         width: 310px;
         height: 180px;
     }
-    .container4 .quizz{
-        margin:24px 0;
+
+    .container4 .quizz {
+        margin: 24px 0;
     }
+
+    /*   TELA 3 - CRIAR UM QUIZZ    */
 }
