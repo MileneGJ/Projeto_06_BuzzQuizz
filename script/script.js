@@ -216,14 +216,14 @@ function corrigirResposta(element, showType = 0) {
                 setTimeout(mostrarResultado, 2000);
                 contadorRespostas = 0;
             } else {
-                setTimeout(mostrarResultado(1), 2000);
+                setTimeout(mostrarResultadoCriado, 2000);
                 contadorRespostas = 0;
             }
 
         }
     }
 }
-function mostrarResultado(showType = 0) {
+function mostrarResultado() {
     const respostas = document.querySelectorAll(".RespSelecionada");
     let total = respostas.length;
     let acertos = 0;
@@ -234,61 +234,67 @@ function mostrarResultado(showType = 0) {
         }
     }
     let niveis;
-    if (showType === 0) {
-        niveis = quizzSelect[0].levels;
-        niveis.sort((a, b) => {
-            return a.minValue - b.minValue;
-        })
-        let acertosPorct = (acertos / total) * 100;
-        acertosPorct = Math.round(acertosPorct);
-        for (let i = (niveis.length - 1); i >= 0; i--) {
-            if (acertosPorct >= niveis[i].minValue) {
-                parent.innerHTML += `<div class="resultadoQuizz">
+    niveis = quizzSelect[0].levels;
+    niveis.sort((a, b) => {
+        return a.minValue - b.minValue;
+    })
+    let acertosPorct = (acertos / total) * 100;
+    acertosPorct = Math.round(acertosPorct);
+    for (let i = (niveis.length - 1); i >= 0; i--) {
+        if (acertosPorct >= niveis[i].minValue) {
+            parent.innerHTML += `<div class="resultadoQuizz">
             <span style="background-color:#EC362D;"><h3>${acertosPorct}% de acerto: ${niveis[i].title}</h3></span>
        <div>
        <img src=${niveis[i].image}>
        <p>${niveis[i].text}</p>
        </div>
        </div>
-       <button onclick="reiniciarQuizz()">Reiniciar Quizz</button>
+       <button class="reinicioQuizz" onclick="reiniciarQuizz()">Reiniciar Quizz</button>
        <button class="home" onclick="voltarHome()">Voltar pra home</button>`
-                break
-            }
+            break
         }
-
-        acertos = 0;
-        document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
-
-    } else {
-
-        niveis = dataFromServer.levels;
-        niveis.sort((a, b) => {
-            return a.minValue - b.minValue;
-        })
-        let acertosPorct = (acertos / total) * 100;
-        acertosPorct = Math.round(acertosPorct);
-        for (let i = (niveis.length - 1); i >= 0; i--) {
-            if (acertosPorct >= niveis[i].minValue) {
-                parent.innerHTML += `<div class="resultadoQuizz">
-            <span style="background-color:#EC362D;"><h3>${acertosPorct}% de acerto: ${niveis[i].title}</h3></span>
-       <div>
-       <img src=${niveis[i].image}>
-       <p>${niveis[i].text}</p>
-       </div>
-       </div>
-       <button onclick="reiniciarQuizz(1)">Reiniciar Quizz</button>
-       <button class="home" onclick="voltarHome()">Voltar pra home</button>`
-                break
-            }
-        }
-
-        acertos = 0;
-        document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
-
-
     }
 
+    acertos = 0;
+    document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
 }
+
+function mostrarResultadoCriado() {
+    const respostas = document.querySelectorAll(".RespSelecionada");
+    let total = respostas.length;
+    let acertos = 0;
+    for (let i = 0; i < respostas.length; i++) {
+        let acertoErro = respostas[i].querySelector("p");
+        if (acertoErro.classList.contains("selectCerto")) {
+            acertos++;
+        }
+    }
+    let niveis;
+    niveis = dataFromServer.levels;
+    niveis.sort((a, b) => {
+        return a.minValue - b.minValue;
+    })
+    let acertosPorct = (acertos / total) * 100;
+    acertosPorct = Math.round(acertosPorct);
+    for (let i = (niveis.length - 1); i >= 0; i--) {
+        if (acertosPorct >= niveis[i].minValue) {
+            parent.innerHTML += `<div class="resultadoQuizz">
+            <span style="background-color:#EC362D;"><h3>${acertosPorct}% de acerto: ${niveis[i].title}</h3></span>
+       <div>
+       <img src=${niveis[i].image}>
+       <p>${niveis[i].text}</p>
+       </div>
+       </div>
+       <button class="reinicioQuizz" onclick="reiniciarQuizz(1)">Reiniciar Quizz</button>
+       <button class="home" onclick="voltarHome()">Voltar pra home</button>`
+            break
+        }
+    }
+
+    acertos = 0;
+    document.querySelector(".resultadoQuizz").scrollIntoView({ behavior: 'smooth' });
+}
+
 
 function voltarHome() {
     window.location.reload();
@@ -371,89 +377,89 @@ function isValidHttpUrl(string) {
 
 // Verificar requisitos dos inputs iniciais e retornar mensagem de erro quando necessário
 function VerificarInputsIniciais(titulo, imagem, nPerguntas, nNiveis) {
+    let alertar = false;
     if (titulo.length < 22 || titulo.length > 65) {
         document.querySelector(".titulo")
-        .classList.add("fillerrado");
+            .classList.add("fillerrado");
 
         document.querySelector('.tituloAlert')
-        .innerHTML = 'O Título deve conter entre 20 e 65 caracteres.';
+            .innerHTML = 'O Título deve conter entre 20 e 65 caracteres.';
 
         alertar = true;
     } else {
-        if(document.querySelector('.titulo').classList.contains('fillerrado')){
+        if (document.querySelector('.titulo').classList.contains('fillerrado')) {
             document.querySelector(".titulo")
-            .classList.remove("fillerrado");
+                .classList.remove("fillerrado");
 
             document.querySelector('.tituloAlert')
-            .innerHTML = '';
+                .innerHTML = '';
         }
 
     }
 
     if (!isValidHttpUrl(imagem)) {
         document.querySelector(".imagem")
-        .classList.add("fillerrado");
+            .classList.add("fillerrado");
 
         document.querySelector('.imagemAlert')
-        .innerHTML = 'Insira uma url válida como imagem.';
+            .innerHTML = 'Insira uma url válida como imagem.';
 
         alertar = true;
     } else {
-        if(document.querySelector('.imagem').classList.contains('fillerrado')){
+        if (document.querySelector('.imagem').classList.contains('fillerrado')) {
             document.querySelector(".imagem")
-            .classList.remove("fillerrado");
+                .classList.remove("fillerrado");
 
             document.querySelector('.imagemAlert')
-            .innerHTML = '';
+                .innerHTML = '';
         }
     }
     if (Number(nPerguntas) < 3) {
         document.querySelector(".nPerguntas")
-        .classList.add("fillerrado");
+            .classList.add("fillerrado");
 
         document.querySelector('.nPerguntasAlert')
-        .innerHTML = 'Adicione pelo menos 3 perguntas.';
+            .innerHTML = 'Adicione pelo menos 3 perguntas.';
 
         alertar = true;
     } else {
-        if(document.querySelector('.nPerguntas').classList.contains('fillerrado')){
+        if (document.querySelector('.nPerguntas').classList.contains('fillerrado')) {
             document.querySelector(".nPerguntas")
-            .classList.remove('fillerrado');
+                .classList.remove('fillerrado');
 
             document.querySelector('.nPerguntasAlert')
-            .innerHTML = '';
+                .innerHTML = '';
         }
     }
     if (Number(nNiveis) < 2) {
         document.querySelector(".nNiveis")
-        .classList.add("fillerrado");
+            .classList.add("fillerrado");
 
         document.querySelector('.nNiveisAlert')
-        .innerHTML = 'Adicione pelo menos 2 níveis.';
+            .innerHTML = 'Adicione pelo menos 2 níveis.';
 
         alertar = true;
     } else {
-        if(document.querySelector('.nNiveis').classList.contains('fillerrado')){
+        if (document.querySelector('.nNiveis').classList.contains('fillerrado')) {
             document.querySelector(".nNiveis")
-            .classList.remove("fillerrado");
+                .classList.remove("fillerrado");
 
             document.querySelector('.nNiveisAlert')
-            .innerHTML = '';
+                .innerHTML = '';
         }
     }
-    
+
     return !alertar;
 }
 
 // Validação completa para iniciar a criação de perguntas
 let nNiveis;
 function CriarPerguntas(edit = false) {
-    const titulo = document.querySelector(".container3 .titulo").value;
-    const imagem = document.querySelector(".container3 .imagem").value;
-    const nPerguntas = document.querySelector(".container3 .nPerguntas").value;
+    let titulo = document.querySelector(".container3 .titulo").value;
+    let imagem = document.querySelector(".container3 .imagem").value;
+    let nPerguntas = document.querySelector(".container3 .nPerguntas").value;
     nNiveis = document.querySelector(".container3 .nNiveis").value;
-    let isValidInputs = VerificarInputsIniciais(titulo, imagem, nPerguntas, nNiveis);  //Usando a função acima, aparece um único alerta de erro nos inputs
-
+    let isValidInputs = VerificarInputsIniciais(titulo, imagem, nPerguntas, nNiveis);
 
     if (isValidInputs) {
         sendToServer.title = titulo;
@@ -521,6 +527,7 @@ function renderQuestions(nQuestions, edit = false) {
                     <span class="rightAnswerURLAlert wrong"></span>
     
                     <h1>Respostas incorretas</h1>
+                    <span class="wrongAnswerMin1Alert wrong"></span>
                 </div>
                 `;
                 if (answSize === 2) {
@@ -594,7 +601,6 @@ function renderQuestions(nQuestions, edit = false) {
                         <ion-icon name="create-outline"></ion-icon>
                     </div>
                     <div class="form escondido">
-                    <h1>Pergunta ${i + 1}</h1>
                         <input class="questionText" type="text" value= "${dataFromServer.questions[i].title}" placeholder="Texto da pergunta">
                         <span class="questionTextAlert wrong"></span>
 
@@ -610,7 +616,7 @@ function renderQuestions(nQuestions, edit = false) {
                         <span class="rightAnswerURLAlert wrong"></span>
         
                         <h1>Respostas incorretas</h1>
-                    
+                        <span class="wrongAnswerMin1Alert wrong"></span>
                     </div>
                 </div>
                 `;
@@ -779,13 +785,9 @@ function renderQuestions(nQuestions, edit = false) {
                     </div>
                 </div>
                 `;
-
             }
         }
-
-
     }
-
 }
 
 function isValidColor(color) {
@@ -807,141 +809,145 @@ function nextToMakeLevels(edit = false) {
 
         //texto da pergunta
         if (getQuestion[i].querySelector('.questionText').value.length < 20) {
+            document.querySelector("header").scrollIntoView();
             document.querySelectorAll(".questionText")[i]
-            .classList.add("fillerrado");
+                .classList.add("fillerrado");
 
             document.querySelectorAll('.questionTextAlert')[i]
-            .innerHTML = 'O texto da pergunta  precisa ter pelo menos 20 carácteres.';
-            
+                .innerHTML = 'O texto da pergunta  precisa ter pelo menos 20 carácteres.';
+
             check = false;
         } else {
-            if(document.querySelectorAll('.questionText')[i].classList.contains('fillerrado')) {
+            if (document.querySelectorAll('.questionText')[i].classList.contains('fillerrado')) {
                 document.querySelectorAll('.questionText')[i]
-                .classList.remove('fillerrado');
+                    .classList.remove('fillerrado');
 
                 document.querySelectorAll('.questionTextAlert')[i]
-                .innerHTML = '';
+                    .innerHTML = '';
             }
         }
 
         //Cor de fundo da pergunta
 
         if (!isValidColor(getQuestion[i].querySelector('.questionBackground').value)) {
+            document.querySelector("header").scrollIntoView();
             document.querySelectorAll(".questionBackground")[i]
-            .classList.add("fillerrado");
+                .classList.add("fillerrado");
 
             document.querySelectorAll('.questionBackgroundAlert')[i]
-            .innerHTML = 'A cor de fundo deve ser no formato #FFFFFF.';
-            
+                .innerHTML = 'A cor de fundo deve ser no formato #FFFFFF.';
+
             check = false;
         } else {
-            if(document.querySelectorAll('.questionBackground')[i].classList.contains('fillerrado')) {
+            if (document.querySelectorAll('.questionBackground')[i].classList.contains('fillerrado')) {
                 document.querySelectorAll('.questionBackground')[i]
-                .classList.remove('fillerrado');
+                    .classList.remove('fillerrado');
 
                 document.querySelectorAll('.questionBackgroundAlert')[i]
-                .innerHTML = '';
+                    .innerHTML = '';
             }
         }
 
         //resposta certa
         if (getQuestion[i].querySelector('.rightAnswer').value === '') {
+            document.querySelector("header").scrollIntoView();
             document.querySelectorAll(".rightAnswer")[i]
-            .classList.add("fillerrado");
+                .classList.add("fillerrado");
 
             document.querySelectorAll('.rightAnswerAlert')[i]
-            .innerHTML = 'A resposta correta não pode estar em branca.';
-            
+                .innerHTML = 'A resposta correta não pode estar em branco.';
+
             check = false;
         } else {
-            if(document.querySelectorAll('.rightAnswer')[i].classList.contains('fillerrado')) {
+            if (document.querySelectorAll('.rightAnswer')[i].classList.contains('fillerrado')) {
                 document.querySelectorAll('.rightAnswer')[i]
-                .classList.remove('fillerrado');
+                    .classList.remove('fillerrado');
 
                 document.querySelectorAll('.rightAnswerAlert')[i]
-                .innerHTML = '';
+                    .innerHTML = '';
             }
         }
 
         //imagem certa
         if (!isValidHttpUrl(getQuestion[i].querySelector('.rightAnswerURL').value)) {
+            document.querySelector("header").scrollIntoView();
             document.querySelectorAll(".rightAnswerURL")[i]
-            .classList.add("fillerrado");
+                .classList.add("fillerrado");
 
             document.querySelectorAll('.rightAnswerURLAlert')[i]
-            .innerHTML = 'A URL da imagem é inválida.';
-            
+                .innerHTML = 'A URL da imagem é inválida.';
+
             check = false;
         } else {
-            if(document.querySelectorAll('.rightAnswerURL')[i].classList.contains('fillerrado')) {
+            if (document.querySelectorAll('.rightAnswerURL')[i].classList.contains('fillerrado')) {
                 document.querySelectorAll('.rightAnswerURL')[i]
-                .classList.remove('fillerrado');
+                    .classList.remove('fillerrado');
 
                 document.querySelectorAll('.rightAnswerURLAlert')[i]
-                .innerHTML = '';
+                    .innerHTML = '';
             }
         }
 
         if (getQuestion[i].querySelector('.wrongAnswer1').value === ''
             && getQuestion[i].querySelector('.wrongAnswer2').value === ''
             && getQuestion[i].querySelector('.wrongAnswer3').value === '') {
+            document.querySelector("header").scrollIntoView();
+            getQuestion[i].querySelector('.wrongAnswerMin1Alert')
+                .innerHTML = 'Pelo menos uma resposta incorreta deve ser preenchida.';
 
-            document.querySelectorAll('.wrongAnswerMin1Alert')[i]
-            .innerHTML = 'Pelo menos uma resposta incorreta deve ser preenchida.';
-            
             check = false;
         } else {
-            if( document.querySelectorAll('.wrongAnswerMin1Alert')[i].innerHTML !== '' ) {
+            if (getQuestion[i].querySelector('.wrongAnswerMin1Alert').innerHTML !== '') {
 
-                document.querySelectorAll('.wrongAnswerMin1Alert')[i]
-                .innerHTML = '';
+                getQuestion[i].querySelector('.wrongAnswerMin1Alert')
+                    .innerHTML = '';
             }
         }
 
-        
+
 
         for (let j = 1; j <= 3; j++) {
             if (getQuestion[i].querySelector(`.wrongAnswer${j}`).value !== '' &&
                 !isValidHttpUrl(getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value)) {
-                
+                document.querySelector("header").scrollIntoView();
                 getQuestion[i].querySelector(`.wrongAnswerURL${j}`)
-                .classList.add("fillerrado");
+                    .classList.add("fillerrado");
 
                 getQuestion[i].querySelector(`.wrongAnswerURLAlert${j}`)
-                .innerHTML = 'A URL da imagem é inválida.';
-                
+                    .innerHTML = 'A URL da imagem é inválida.';
+
                 check = false;
             } else {
-                if(getQuestion[i].querySelector(`.wrongAnswerURL${j}`).classList.contains('fillerrado')) {
-                     getQuestion[i].querySelector(`.wrongAnswerURL${j}`)
-                .classList.remove("fillerrado");
+                if (getQuestion[i].querySelector(`.wrongAnswerURL${j}`).classList.contains('fillerrado')) {
+                    getQuestion[i].querySelector(`.wrongAnswerURL${j}`)
+                        .classList.remove("fillerrado");
 
-                getQuestion[i].querySelector(`.wrongAnswerURLAlert${j}`)
-                .innerHTML = '';
+                    getQuestion[i].querySelector(`.wrongAnswerURLAlert${j}`)
+                        .innerHTML = '';
 
                 }
-            } 
+            }
 
 
 
-            
+
             if (getQuestion[i].querySelector(`.wrongAnswer${j}`).value === '' &&
                 getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value !== '') {
-
+                document.querySelector("header").scrollIntoView();
                 getQuestion[i].querySelector(`.wrongAnswer${j}`)
-                .classList.add("fillerrado");
+                    .classList.add("fillerrado");
 
                 getQuestion[i].querySelector(`.wrongAnswerAlert${j}`)
-                .innerHTML = 'A resposta incorreta está em branco.';
-                
+                    .innerHTML = 'A resposta incorreta está em branco.';
+
                 check = false;
             } else {
-                if(getQuestion[i].querySelector(`.wrongAnswer${j}`).classList.contains('fillerrado')) {
-                     getQuestion[i].querySelector(`.wrongAnswer${j}`)
-                .classList.remove("fillerrado");
+                if (getQuestion[i].querySelector(`.wrongAnswer${j}`).classList.contains('fillerrado')) {
+                    getQuestion[i].querySelector(`.wrongAnswer${j}`)
+                        .classList.remove("fillerrado");
 
-                getQuestion[i].querySelector(`.wrongAnswerAlert${j}`)
-                .innerHTML = '';
+                    getQuestion[i].querySelector(`.wrongAnswerAlert${j}`)
+                        .innerHTML = '';
 
                 }
             }
@@ -1044,7 +1050,7 @@ function renderLevels(levels, edit = false) {
             }
 
         } else {
-            
+
             if (i === 0) {
                 levelsHTML.innerHTML += `<h1>Agora, decida os níveis!</h1>`;
                 levelsHTML.innerHTML += `
@@ -1110,18 +1116,21 @@ function nextToSucessQuizz(edit = false) {
     for (let i = 0; i < getLevel.length; i++) {
 
         if (getLevel[i].querySelector('.levelText').value.length < 10) {
-            
+            document.querySelector("header").scrollIntoView();
             getLevel[i].querySelector(".levelText")
-            .classList.add("fillerrado");
+                .classList.add("fillerrado");
 
             getLevel[i].querySelector('.levelTextAlert')
-            .innerHTML = 'O título precisa ter pelo menos 10 carácteres.';
+                .innerHTML = 'O título precisa ter pelo menos 10 caracteres.';
             check = false;
         } else {
-            if( getLevel[i].querySelector(".levelText")
-            .classList.contains("fillerrado")) {
+            if (getLevel[i].querySelector(".levelText")
+                .classList.contains("fillerrado")) {
+
+                getLevel[i].querySelector(".levelText")
+                    .classList.remove("fillerrado")
                 getLevel[i].querySelector('.levelTextAlert')
-            .innerHTML = '';
+                    .innerHTML = '';
             }
 
         }
@@ -1131,18 +1140,20 @@ function nextToSucessQuizz(edit = false) {
             getLevel[i].querySelector('.levelmin').value === '' ||
             parseInt(getLevel[i].querySelector('.levelmin').value) > 100 ||
             parseInt(getLevel[i].querySelector('.levelmin').value) < 0) {
-
+            document.querySelector("header").scrollIntoView();
             getLevel[i].querySelector(".levelmin")
-            .classList.add("fillerrado");
+                .classList.add("fillerrado");
 
             getLevel[i].querySelector('.levelminAlert')
-            .innerHTML = 'A % de acerto mínimo precisa ser um número de 0 a 100.';
+                .innerHTML = 'A % de acerto mínimo precisa ser um número de 0 a 100.';
             check = false;
         } else {
-            if( getLevel[i].querySelector(".levelmin")
-            .classList.contains("fillerrado")) {
+            if (getLevel[i].querySelector(".levelmin")
+                .classList.contains("fillerrado")) {
+                getLevel[i].querySelector(".levelmin")
+                    .classList.remove("fillerrado");
                 getLevel[i].querySelector('.levelminAlert')
-            .innerHTML = '';
+                    .innerHTML = '';
             }
         }
 
@@ -1151,49 +1162,55 @@ function nextToSucessQuizz(edit = false) {
         }
 
         if (!isValidHttpUrl(getLevel[i].querySelector('.levelURL').value)) {
+            document.querySelector("header").scrollIntoView();
             getLevel[i].querySelector(".levelURL")
-            .classList.add("fillerrado");
+                .classList.add("fillerrado");
 
             getLevel[i].querySelector('.levelURLAlert')
-            .innerHTML = 'A URL da imagem é inválida.';
+                .innerHTML = 'A URL da imagem é inválida.';
             check = false;
         } else {
-            if( getLevel[i].querySelector(".levelURL")
-            .classList.contains("fillerrado")) {
+            if (getLevel[i].querySelector(".levelURL")
+                .classList.contains("fillerrado")) {
+                getLevel[i].querySelector(".levelURL")
+                    .classList.remove("fillerrado");
                 getLevel[i].querySelector('.levelURLAlert')
-            .innerHTML = '';
+                    .innerHTML = '';
             }
         }
 
         if (getLevel[i].querySelector('.levelDesc').value.length < 30) {
+            document.querySelector("header").scrollIntoView();
             getLevel[i].querySelector(".levelDesc")
-            .classList.add("fillerrado");
+                .classList.add("fillerrado");
 
             getLevel[i].querySelector('.levelDescAlert')
-            .innerHTML = 'A descrição precisa ter pelo menos 30 carácteres.';
+                .innerHTML = 'A descrição precisa ter pelo menos 30 carácteres.';
             check = false;
         } else {
-            if( getLevel[i].querySelector(".levelDesc")
-            .classList.contains("fillerrado")) {
+            if (getLevel[i].querySelector(".levelDesc")
+                .classList.contains("fillerrado")) {
+                getLevel[i].querySelector(".levelDesc")
+                    .classList.remove("fillerrado");
                 getLevel[i].querySelector('.levelDescAlert')
-            .innerHTML = '';
+                    .innerHTML = '';
             }
         }
 
     }
     for (let i = 0; i < getLevel.length; i++) {
         if (!isZero) {
-        
+            document.querySelector("header").scrollIntoView();
             getLevel[i].querySelector('.minValAlert')
-            .innerHTML = 'É obrigatório existir pelo menos um nível cuja % de acerto mínima seja 0%.';
+                .innerHTML = 'É obrigatório existir pelo menos um nível cuja % de acerto mínima seja 0%.';
             check = false;
-            
+
         } else {
             getLevel[i].querySelector('.minValAlert')
-            .innerHTML = '';
+                .innerHTML = '';
         }
     }
-    
+
 
     if (check) {
         sendToServer.levels = [];
@@ -1339,6 +1356,7 @@ function SaveEditedQuizz(myID) {
     const key = JSON.parse(localStorage.getItem("dataQuiz")).myKey[getKeyIndex];
     const sendHeader = { headers: { "Secret-Key": `${key}` } };
     const sendDelete = axios.put(`${API}/${myID}`, sendToServer, sendHeader);
+    parent.innerHTML = '';
     loadCircle.display = "inline-block";
     sendDelete.then(nextToSucess);
 
@@ -1363,7 +1381,7 @@ function debugLevels() {
     renderLevels(2);
 }
 
-function debugQuestions(){
+function debugQuestions() {
     showQuestions();
     renderQuestions(3);
 }
