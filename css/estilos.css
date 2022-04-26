@@ -447,6 +447,23 @@ ion-icon:hover {
 }
 /*  TELA 3 - Criando um Quizz  */
 
+.wrong {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    color: #EC362D;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+.form {
+    width: 100%;
+}
+
+.levelDesc {
+    size: 180px;
+}
 
 
 /* Loading */

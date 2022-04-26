@@ -316,9 +316,16 @@ function aparecerCriarQuizz(edit = false) {
         <h1>Comece pelo começo (edição)</h1>
             <div>
                 <input class="titulo" type="text" value = "${dataFromServer.title}" placeholder="Título do seu quizz">
+                <span class="tituloAlert wrong"></span>
+
                 <input class="imagem" type="url" value = "${dataFromServer.image}"placeholder="URL da imagem do seu quizz">
+                <span class="imagemAlert wrong"></span>
+
                 <input class="nPerguntas" type="text" value = "${dataFromServer.questions.length}" placeholder="Quantidade de perguntas do quizz">
+                <span class="nPerguntasAlert wrong"></span>
+                
                 <input class="nNiveis" type="text" value = "${dataFromServer.levels.length}" placeholder="Quantidade de níveis do quizz">
+                <span class="nNiveisAlert wrong"></span>
             </div>
         <button type="button" onclick="CriarPerguntas(true)">Prosseguir para editar perguntas</button>`;
     } else {
@@ -326,9 +333,18 @@ function aparecerCriarQuizz(edit = false) {
         <h1>Comece pelo começo</h1>
             <div>
                 <input class="titulo" type="text" placeholder="Título do seu quizz">
+                <span class="tituloAlert wrong"></span>
+
                 <input class="imagem" type="url" placeholder="URL da imagem do seu quizz">
+                <span class="imagemAlert wrong"></span>
+
+
                 <input class="nPerguntas" type="text" placeholder="Quantidade de perguntas do quizz">
+                <span class="nPerguntasAlert wrong"></span>
+
                 <input class="nNiveis" type="text" placeholder="Quantidade de níveis do quizz">
+                <span class="nNiveisAlert wrong"></span>
+
             </div>
         <button type="button" onclick="CriarPerguntas()">Prosseguir para criar perguntas</button>`;
     }
@@ -356,27 +372,76 @@ function isValidHttpUrl(string) {
 // Verificar requisitos dos inputs iniciais e retornar mensagem de erro quando necessário
 function VerificarInputsIniciais(titulo, imagem, nPerguntas, nNiveis) {
     if (titulo.length < 22 || titulo.length > 65) {
-        let input = document.querySelector(".container3 .titulo");
-        input.classList.add("fillerrado");
+        document.querySelector(".titulo")
+        .classList.add("fillerrado");
 
-        msgAlerta += "Titulo deve conter entre 20 e 65 caracteres\n";
+        document.querySelector('.tituloAlert')
+        .innerHTML = 'O Título deve conter entre 20 e 65 caracteres.';
+
         alertar = true;
+    } else {
+        if(document.querySelector('.titulo').classList.contains('fillerrado')){
+            document.querySelector(".titulo")
+            .classList.remove("fillerrado");
+
+            document.querySelector('.tituloAlert')
+            .innerHTML = '';
+        }
+
     }
+
     if (!isValidHttpUrl(imagem)) {
-        msgAlerta += "Insira um url válido como imagem\n";
+        document.querySelector(".imagem")
+        .classList.add("fillerrado");
+
+        document.querySelector('.imagemAlert')
+        .innerHTML = 'Insira uma url válida como imagem.';
+
         alertar = true;
+    } else {
+        if(document.querySelector('.imagem').classList.contains('fillerrado')){
+            document.querySelector(".imagem")
+            .classList.remove("fillerrado");
+
+            document.querySelector('.imagemAlert')
+            .innerHTML = '';
+        }
     }
     if (Number(nPerguntas) < 3) {
-        msgAlerta += "Adicione pelo menos 3 perguntas\n";
+        document.querySelector(".nPerguntas")
+        .classList.add("fillerrado");
+
+        document.querySelector('.nPerguntasAlert')
+        .innerHTML = 'Adicione pelo menos 3 perguntas.';
+
         alertar = true;
+    } else {
+        if(document.querySelector('.nPerguntas').classList.contains('fillerrado')){
+            document.querySelector(".nPerguntas")
+            .classList.remove('fillerrado');
+
+            document.querySelector('.nPerguntasAlert')
+            .innerHTML = '';
+        }
     }
     if (Number(nNiveis) < 2) {
-        msgAlerta += "Adicione pelo menos 2 níveis\n";
+        document.querySelector(".nNiveis")
+        .classList.add("fillerrado");
+
+        document.querySelector('.nNiveisAlert')
+        .innerHTML = 'Adicione pelo menos 2 níveis.';
+
         alertar = true;
+    } else {
+        if(document.querySelector('.nNiveis').classList.contains('fillerrado')){
+            document.querySelector(".nNiveis")
+            .classList.remove("fillerrado");
+
+            document.querySelector('.nNiveisAlert')
+            .innerHTML = '';
+        }
     }
-    if (alertar) {
-        alert(msgAlerta);
-    }
+    
     return !alertar;
 }
 
@@ -442,12 +507,18 @@ function renderQuestions(nQuestions, edit = false) {
                 <div class="question">
                     <h1>Pergunta ${i + 1}</h1>
                     <input class="questionText" type="text" value= "${dataFromServer.questions[i].title}" placeholder="Texto da pergunta">
+                    <span class="questionTextAlert wrong"></span>
+
                     <input class="questionBackground" type="text" value= "${dataFromServer.questions[i].color}" placeholder="Cor de fundo da pergunta">
+                    <span class="questionBackgroundAlert wrong"></span>
                     
                     <h1>Resposta correta</h1>
     
                     <input class="rightAnswer" value = "${dataFromServer.questions[i].answers[0].text}" type="text" placeholder="Resposta correta">
+                    <span class="rightAnswerAlert wrong"></span>
+
                     <input class="rightAnswerURL" value = "${dataFromServer.questions[i].answers[0].image}" type="url" placeholder="URL da imagem">
+                    <span class="rightAnswerURLAlert wrong"></span>
     
                     <h1>Respostas incorretas</h1>
                 </div>
@@ -455,36 +526,64 @@ function renderQuestions(nQuestions, edit = false) {
                 if (answSize === 2) {
                     document.querySelector('.question').innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <span class="wrongAnswerAlert1 wrong"></span>
+                    
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
-    
+                    <span class="wrongAnswerURLAlert1 wrong"></span>
+
                     <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                    <span class="wrongAnswerAlert2 wrong"></span>
+
                     <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
-    
+                    <span class="wrongAnswerURLAlert2 wrong"></span>
+
+
                     <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <span class="wrongAnswerAlert3 wrong"></span>
+
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    <span class="wrongAnswerURLAlert3 wrong"></span>
                     `;
                 } else if (answSize === 3) {
                     document.querySelector('.question').innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <span class="wrongAnswerAlert1 wrong"></span>
+
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
-    
+                    <span class="wrongAnswerURLAlert1 wrong"></span>
+
                     <input class="wrongAnswer2" type="text" value = "${dataFromServer.questions[i].answers[2].text}" placeholder="Resposta incorreta 2">
+                    <span class="wrongAnswerAlert2 wrong"></span>
+
                     <input class="wrongAnswerURL2" type="url" value = "${dataFromServer.questions[i].answers[2].image}" placeholder="URL da imagem 2">
+                    <span class="wrongAnswerURLAlert2 wrong"></span>
     
                     <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <span class="wrongAnswerAlert3 wrong"></span>
+
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    <span class="wrongAnswerURLAlert3 wrong"></span>
                     `;
 
                 } else if (answSize === 4) {
                     document.querySelector('.question').innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <span class="wrongAnswerAlert1 wrong"></span>
+
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
-    
+                    <span class="wrongAnswerURLAlert1 wrong"></span>
+
                     <input class="wrongAnswer2" type="text" value = "${dataFromServer.questions[i].answers[2].text}" placeholder="Resposta incorreta 2">
+                    <span class="wrongAnswerAlert2 wrong"></span>
+
                     <input class="wrongAnswerURL2" type="url" value = "${dataFromServer.questions[i].answers[2].image}" placeholder="URL da imagem 2">
+                    <span class="wrongAnswerURLAlert2 wrong"></span>
     
                     <input class="wrongAnswer3" type="text" value = "${dataFromServer.questions[i].answers[3].text}" placeholder="Resposta incorreta 3">
+                    <span class="wrongAnswerAlert3 wrong"></span>
+
                     <input class="wrongAnswerURL3" type="url" value = "${dataFromServer.questions[i].answers[3].image}" placeholder="URL da imagem 3">
+                    <span class="wrongAnswerURLAlert3 wrong"></span>
                     `;
                 }
             } else {
@@ -495,16 +594,22 @@ function renderQuestions(nQuestions, edit = false) {
                         <ion-icon name="create-outline"></ion-icon>
                     </div>
                     <div class="form escondido">
-                    <input class="questionText" type="text" value= "${dataFromServer.questions[i].title}" placeholder="Texto da pergunta">
-                    <input class="questionBackground" type="text" value= "${dataFromServer.questions[i].color}" placeholder="Cor de fundo da pergunta">
-                    
-                    <h1>Resposta correta</h1>
-    
-                    <input class="rightAnswer" value = "${dataFromServer.questions[i].answers[0].text}" type="text" placeholder="Resposta correta">
-                    <input class="rightAnswerURL" value = "${dataFromServer.questions[i].answers[0].image}" type="url" placeholder="URL da imagem">
-    
-                    <h1>Respostas incorretas</h1>
-    
+                    <h1>Pergunta ${i + 1}</h1>
+                        <input class="questionText" type="text" value= "${dataFromServer.questions[i].title}" placeholder="Texto da pergunta">
+                        <span class="questionTextAlert wrong"></span>
+
+                        <input class="questionBackground" type="text" value= "${dataFromServer.questions[i].color}" placeholder="Cor de fundo da pergunta">
+                        <span class="questionBackgroundAlert wrong"></span>
+                        
+                        <h1>Resposta correta</h1>
+        
+                        <input class="rightAnswer" value = "${dataFromServer.questions[i].answers[0].text}" type="text" placeholder="Resposta correta">
+                        <span class="rightAnswerAlert wrong"></span>
+
+                        <input class="rightAnswerURL" value = "${dataFromServer.questions[i].answers[0].image}" type="url" placeholder="URL da imagem">
+                        <span class="rightAnswerURLAlert wrong"></span>
+        
+                        <h1>Respostas incorretas</h1>
                     
                     </div>
                 </div>
@@ -513,36 +618,64 @@ function renderQuestions(nQuestions, edit = false) {
                 if (answSize === 2) {
                     document.querySelectorAll(".form")[document.querySelectorAll(".form").length - 1].innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <span class="wrongAnswerAlert1 wrong"></span>
+                    
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
-    
+                    <span class="wrongAnswerURLAlert1 wrong"></span>
+
                     <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                    <span class="wrongAnswerAlert2 wrong"></span>
+
                     <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
-    
+                    <span class="wrongAnswerURLAlert2 wrong"></span>
+
+
                     <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <span class="wrongAnswerAlert3 wrong"></span>
+
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    <span class="wrongAnswerURLAlert3 wrong"></span>
                     `;
                 } else if (answSize === 3) {
                     document.querySelectorAll(".form")[document.querySelectorAll(".form").length - 1].innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <span class="wrongAnswerAlert1 wrong"></span>
+
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
-    
+                    <span class="wrongAnswerURLAlert1 wrong"></span>
+
                     <input class="wrongAnswer2" type="text" value = "${dataFromServer.questions[i].answers[2].text}" placeholder="Resposta incorreta 2">
+                    <span class="wrongAnswerAlert2 wrong"></span>
+
                     <input class="wrongAnswerURL2" type="url" value = "${dataFromServer.questions[i].answers[2].image}" placeholder="URL da imagem 2">
+                    <span class="wrongAnswerURLAlert2 wrong"></span>
     
                     <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <span class="wrongAnswerAlert3 wrong"></span>
+
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    <span class="wrongAnswerURLAlert3 wrong"></span>
                     `;
 
                 } else if (answSize === 4) {
                     document.querySelectorAll(".form")[document.querySelectorAll(".form").length - 1].innerHTML += `
                     <input class="wrongAnswer1" type="text" value = "${dataFromServer.questions[i].answers[1].text}" placeholder="Resposta incorreta 1">
+                    <span class="wrongAnswerAlert1 wrong"></span>
+
                     <input class="wrongAnswerURL1" type="url" value = "${dataFromServer.questions[i].answers[1].image}"placeholder="URL da imagem 1">
-    
+                    <span class="wrongAnswerURLAlert1 wrong"></span>
+
                     <input class="wrongAnswer2" type="text" value = "${dataFromServer.questions[i].answers[2].text}" placeholder="Resposta incorreta 2">
+                    <span class="wrongAnswerAlert2 wrong"></span>
+
                     <input class="wrongAnswerURL2" type="url" value = "${dataFromServer.questions[i].answers[2].image}" placeholder="URL da imagem 2">
+                    <span class="wrongAnswerURLAlert2 wrong"></span>
     
                     <input class="wrongAnswer3" type="text" value = "${dataFromServer.questions[i].answers[3].text}" placeholder="Resposta incorreta 3">
+                    <span class="wrongAnswerAlert3 wrong"></span>
+
                     <input class="wrongAnswerURL3" type="url" value = "${dataFromServer.questions[i].answers[3].image}" placeholder="URL da imagem 3">
+                    <span class="wrongAnswerURLAlert3 wrong"></span>
                     `;
                 }
 
@@ -556,23 +689,45 @@ function renderQuestions(nQuestions, edit = false) {
                 <div class="question">
                     <h1>Pergunta ${i + 1}</h1>
                     <input class="questionText" type="text" placeholder="Texto da pergunta">
+                    <span class="questionTextAlert wrong"></span>
+
                     <input class="questionBackground" type="text" placeholder="Cor de fundo da pergunta">
-                    
+                    <span class="questionBackgroundAlert wrong"></span>
+
                     <h1>Resposta correta</h1>
     
                     <input class="rightAnswer" type="text" placeholder="Resposta correta">
+                    <span class="rightAnswerAlert wrong"></span>
+
                     <input class="rightAnswerURL" type="url" placeholder="URL da imagem">
+                    <span class="rightAnswerURLAlert wrong"></span>
+
     
                     <h1>Respostas incorretas</h1>
+                    <span class="wrongAnswerMin1Alert wrong"></span>
     
                     <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
+                    <span class="wrongAnswerAlert1 wrong"></span>
+
                     <input class="wrongAnswerURL1" type="url" placeholder="URL da imagem 1">
+                    <span class="wrongAnswerURLAlert1 wrong"></span>
+
+
     
                     <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                    <span class="wrongAnswerAlert2 wrong"></span>
+
                     <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
+                    <span class="wrongAnswerURLAlert2 wrong"></span>
+
+
     
                     <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <span class="wrongAnswerAlert3 wrong"></span>
+
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    <span class="wrongAnswerURLAlert3 wrong"></span>
+
                 </div>
                 `;
             } else {
@@ -584,23 +739,43 @@ function renderQuestions(nQuestions, edit = false) {
                     </div>
                     <div class="form escondido">
                     <input class="questionText" type="text" placeholder="Texto da pergunta">
+                    <span class="questionTextAlert wrong"></span>
+
                     <input class="questionBackground" type="text" placeholder="Cor de fundo da pergunta">
-                    
+                    <span class="questionBackgroundAlert wrong"></span>
+
                     <h1>Resposta correta</h1>
     
                     <input class="rightAnswer" type="text" placeholder="Resposta correta">
+                    <span class="rightAnswerAlert wrong"></span>
+
                     <input class="rightAnswerURL" type="url" placeholder="URL da imagem">
+                    <span class="rightAnswerURLAlert wrong"></span>
     
                     <h1>Respostas incorretas</h1>
-    
+                    <span class="wrongAnswerMin1Alert wrong"></span>
+
                     <input class="wrongAnswer1" type="text" placeholder="Resposta incorreta 1">
+                    <span class="wrongAnswerAlert1 wrong"></span>
+
                     <input class="wrongAnswerURL1" type="url" placeholder="URL da imagem 1">
+                    <span class="wrongAnswerURLAlert1 wrong"></span>
+
+
     
                     <input class="wrongAnswer2" type="text" placeholder="Resposta incorreta 2">
+                    <span class="wrongAnswerAlert2 wrong"></span>
+
                     <input class="wrongAnswerURL2" type="url" placeholder="URL da imagem 2">
+                    <span class="wrongAnswerURLAlert2 wrong"></span>
+
+
     
                     <input class="wrongAnswer3" type="text" placeholder="Resposta incorreta 3">
+                    <span class="wrongAnswerAlert3 wrong"></span>
+
                     <input class="wrongAnswerURL3" type="url" placeholder="URL da imagem 3">
+                    <span class="wrongAnswerURLAlert3 wrong"></span>
                     </div>
                 </div>
                 `;
@@ -630,42 +805,145 @@ function nextToMakeLevels(edit = false) {
     let check = true;
     for (let i = 0; i < getQuestion.length; i++) {
 
+        //texto da pergunta
         if (getQuestion[i].querySelector('.questionText').value.length < 20) {
-            console.log(`O texto da pergunta ${i + 1} precisa ter pelo menos 20 carácteres`);
+            document.querySelectorAll(".questionText")[i]
+            .classList.add("fillerrado");
+
+            document.querySelectorAll('.questionTextAlert')[i]
+            .innerHTML = 'O texto da pergunta  precisa ter pelo menos 20 carácteres.';
+            
             check = false;
+        } else {
+            if(document.querySelectorAll('.questionText')[i].classList.contains('fillerrado')) {
+                document.querySelectorAll('.questionText')[i]
+                .classList.remove('fillerrado');
+
+                document.querySelectorAll('.questionTextAlert')[i]
+                .innerHTML = '';
+            }
         }
+
+        //Cor de fundo da pergunta
 
         if (!isValidColor(getQuestion[i].querySelector('.questionBackground').value)) {
-            console.log(`A cor de fundo da pergunta ${i + 1} deve ser no formato "#FFFFFF`);
+            document.querySelectorAll(".questionBackground")[i]
+            .classList.add("fillerrado");
+
+            document.querySelectorAll('.questionBackgroundAlert')[i]
+            .innerHTML = 'A cor de fundo deve ser no formato #FFFFFF.';
+            
             check = false;
+        } else {
+            if(document.querySelectorAll('.questionBackground')[i].classList.contains('fillerrado')) {
+                document.querySelectorAll('.questionBackground')[i]
+                .classList.remove('fillerrado');
+
+                document.querySelectorAll('.questionBackgroundAlert')[i]
+                .innerHTML = '';
+            }
         }
 
+        //resposta certa
         if (getQuestion[i].querySelector('.rightAnswer').value === '') {
-            console.log(`A resposta correta da pergunta ${i + 1} não pode estar em branco`);
+            document.querySelectorAll(".rightAnswer")[i]
+            .classList.add("fillerrado");
+
+            document.querySelectorAll('.rightAnswerAlert')[i]
+            .innerHTML = 'A resposta correta não pode estar em branca.';
+            
             check = false;
+        } else {
+            if(document.querySelectorAll('.rightAnswer')[i].classList.contains('fillerrado')) {
+                document.querySelectorAll('.rightAnswer')[i]
+                .classList.remove('fillerrado');
+
+                document.querySelectorAll('.rightAnswerAlert')[i]
+                .innerHTML = '';
+            }
+        }
+
+        //imagem certa
+        if (!isValidHttpUrl(getQuestion[i].querySelector('.rightAnswerURL').value)) {
+            document.querySelectorAll(".rightAnswerURL")[i]
+            .classList.add("fillerrado");
+
+            document.querySelectorAll('.rightAnswerURLAlert')[i]
+            .innerHTML = 'A URL da imagem é inválida.';
+            
+            check = false;
+        } else {
+            if(document.querySelectorAll('.rightAnswerURL')[i].classList.contains('fillerrado')) {
+                document.querySelectorAll('.rightAnswerURL')[i]
+                .classList.remove('fillerrado');
+
+                document.querySelectorAll('.rightAnswerURLAlert')[i]
+                .innerHTML = '';
+            }
         }
 
         if (getQuestion[i].querySelector('.wrongAnswer1').value === ''
             && getQuestion[i].querySelector('.wrongAnswer2').value === ''
             && getQuestion[i].querySelector('.wrongAnswer3').value === '') {
-            console.log(`Pelo menos uma resposta incorreta  da pergunta ${i + 1} deve ser preenchida`);
+
+            document.querySelectorAll('.wrongAnswerMin1Alert')[i]
+            .innerHTML = 'Pelo menos uma resposta incorreta deve ser preenchida.';
+            
             check = false;
+        } else {
+            if( document.querySelectorAll('.wrongAnswerMin1Alert')[i].innerHTML !== '' ) {
+
+                document.querySelectorAll('.wrongAnswerMin1Alert')[i]
+                .innerHTML = '';
+            }
         }
 
-        if (!isValidHttpUrl(getQuestion[i].querySelector('.rightAnswerURL').value)) {
-            console.log(`A URL da imagem da resposta correta da pergunta ${i + 1} é inválido`);
-            check = false;
-        }
+        
 
         for (let j = 1; j <= 3; j++) {
             if (getQuestion[i].querySelector(`.wrongAnswer${j}`).value !== '' &&
                 !isValidHttpUrl(getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value)) {
-                console.log(`A URL da imagem da resposta ${j} incorreta da pergunta ${i + 1} é inválido`);
+                
+                getQuestion[i].querySelector(`.wrongAnswerURL${j}`)
+                .classList.add("fillerrado");
+
+                getQuestion[i].querySelector(`.wrongAnswerURLAlert${j}`)
+                .innerHTML = 'A URL da imagem é inválida.';
+                
                 check = false;
-            } else if (getQuestion[i].querySelector(`.wrongAnswer${j}`).value === '' &&
+            } else {
+                if(getQuestion[i].querySelector(`.wrongAnswerURL${j}`).classList.contains('fillerrado')) {
+                     getQuestion[i].querySelector(`.wrongAnswerURL${j}`)
+                .classList.remove("fillerrado");
+
+                getQuestion[i].querySelector(`.wrongAnswerURLAlert${j}`)
+                .innerHTML = '';
+
+                }
+            } 
+
+
+
+            
+            if (getQuestion[i].querySelector(`.wrongAnswer${j}`).value === '' &&
                 getQuestion[i].querySelector(`.wrongAnswerURL${j}`).value !== '') {
-                console.log(`A resposta incorreta ${j} da pergunta ${i + 1} está em branco`);
+
+                getQuestion[i].querySelector(`.wrongAnswer${j}`)
+                .classList.add("fillerrado");
+
+                getQuestion[i].querySelector(`.wrongAnswerAlert${j}`)
+                .innerHTML = 'A resposta incorreta está em branco.';
+                
                 check = false;
+            } else {
+                if(getQuestion[i].querySelector(`.wrongAnswer${j}`).classList.contains('fillerrado')) {
+                     getQuestion[i].querySelector(`.wrongAnswer${j}`)
+                .classList.remove("fillerrado");
+
+                getQuestion[i].querySelector(`.wrongAnswerAlert${j}`)
+                .innerHTML = '';
+
+                }
             }
 
         }
@@ -724,12 +1002,18 @@ function renderLevels(levels, edit = false) {
                 levelsHTML.innerHTML += `
                 <div class="level">
                     <h1>Nível ${i + 1}</h1>
+                    <span class="minValAlert wrong"></span>
                     <input class="levelText" type="text" value="${dataFromServer.levels[i].title}" placeholder="Título do nível">
+                    <span class="levelTextAlert wrong"></span>
+
                     <input class="levelmin" type="text" value="${dataFromServer.levels[i].minValue}" placeholder="% de acerto mínima">
+                    <span class="levelminAlert wrong"></span>
                     
                     <input class="levelURL" type="url" value="${dataFromServer.levels[i].image}" placeholder="URL da imagem do nível">
+                    <span class="levelURLAlert wrong"></span>
     
                     <input class="levelDesc" type="text" value="${dataFromServer.levels[i].text}" placeholder="Descrição do nível">
+                    <span class="levelDescAlert wrong"></span>
       
                 </div>
                 `;
@@ -740,13 +1024,19 @@ function renderLevels(levels, edit = false) {
                         <h1>Nível ${i + 1}</h1>
                         <ion-icon name="create-outline"></ion-icon>
                     </div>
+                    <span class="minValAlert wrong"></span>
                     <div class="form escondido">
                         <input class="levelText" type="text" value="${dataFromServer.levels[i].title}" placeholder="Título do nível">
+                        <span class="levelTextAlert wrong"></span>
+
                         <input class="levelmin" type="text" value="${dataFromServer.levels[i].minValue}" placeholder="% de acerto mínima">
-                    
+                        <span class="levelminAlert wrong"></span>
+                        
                         <input class="levelURL" type="url" value="${dataFromServer.levels[i].image}" placeholder="URL da imagem do nível">
-    
+                        <span class="levelURLAlert wrong"></span>
+        
                         <input class="levelDesc" type="text" value="${dataFromServer.levels[i].text}" placeholder="Descrição do nível">
+                        <span class="levelDescAlert wrong"></span>
                     </div>
                 </div>
                 `;
@@ -754,17 +1044,24 @@ function renderLevels(levels, edit = false) {
             }
 
         } else {
-            levelsHTML.innerHTML += `<h1>Agora, decida os níveis!</h1>`;
+            
             if (i === 0) {
+                levelsHTML.innerHTML += `<h1>Agora, decida os níveis!</h1>`;
                 levelsHTML.innerHTML += `
                 <div class="level">
                     <h1>Nível ${i + 1}</h1>
+                    <span class="minValAlert wrong"></span>
                     <input class="levelText" type="text" placeholder="Título do nível">
+                    <span class="levelTextAlert wrong"></span>
+
                     <input class="levelmin" type="text" placeholder="% de acerto mínima">
-                    
+                    <span class="levelminAlert wrong"></span>
+
                     <input class="levelURL" type="url" placeholder="URL da imagem do nível">
-    
+                    <span class="levelURLAlert wrong"></span>
+
                     <input class="levelDesc" type="text" placeholder="Descrição do nível">
+                    <span class="levelDescAlert wrong"></span>
       
                 </div>
                 `;
@@ -775,13 +1072,19 @@ function renderLevels(levels, edit = false) {
                         <h1>Nível ${i + 1}</h1>
                         <ion-icon name="create-outline"></ion-icon>
                     </div>
+                    <span class="minValAlert wrong"></span>
                     <div class="form escondido">
                         <input class="levelText" type="text" placeholder="Título do nível">
+                        <span class="levelTextAlert wrong"></span>
+
                         <input class="levelmin" type="text" placeholder="% de acerto mínima">
-                        
+                        <span class="levelminAlert wrong"></span>
+
                         <input class="levelURL" type="url" placeholder="URL da imagem do nível">
-    
+                        <span class="levelURLAlert wrong"></span>
+
                         <input class="levelDesc" type="text" placeholder="Descrição do nível">
+                        <span class="levelDescAlert wrong"></span>
                     </div>
                 </div>
                 `;
@@ -805,17 +1108,42 @@ function nextToSucessQuizz(edit = false) {
     let check = true;
     let isZero = false;
     for (let i = 0; i < getLevel.length; i++) {
+
         if (getLevel[i].querySelector('.levelText').value.length < 10) {
+            
+            getLevel[i].querySelector(".levelText")
+            .classList.add("fillerrado");
+
+            getLevel[i].querySelector('.levelTextAlert')
+            .innerHTML = 'O título precisa ter pelo menos 10 carácteres.';
             check = false;
-            console.log(`O título do nível ${i + 1} precisa ter pelo menos 10 carácteres`);
+        } else {
+            if( getLevel[i].querySelector(".levelText")
+            .classList.contains("fillerrado")) {
+                getLevel[i].querySelector('.levelTextAlert')
+            .innerHTML = '';
+            }
+
         }
+
 
         if (isNaN(getLevel[i].querySelector('.levelmin').value) ||
             getLevel[i].querySelector('.levelmin').value === '' ||
             parseInt(getLevel[i].querySelector('.levelmin').value) > 100 ||
             parseInt(getLevel[i].querySelector('.levelmin').value) < 0) {
+
+            getLevel[i].querySelector(".levelmin")
+            .classList.add("fillerrado");
+
+            getLevel[i].querySelector('.levelminAlert')
+            .innerHTML = 'A % de acerto mínimo precisa ser um número de 0 a 100.';
             check = false;
-            console.log(`A % de acerto mínimo do nível ${i + 1} precisa ser um número de 0 a 100`);
+        } else {
+            if( getLevel[i].querySelector(".levelmin")
+            .classList.contains("fillerrado")) {
+                getLevel[i].querySelector('.levelminAlert')
+            .innerHTML = '';
+            }
         }
 
         if (parseInt(getLevel[i].querySelector('.levelmin').value) === 0) {
@@ -823,21 +1151,49 @@ function nextToSucessQuizz(edit = false) {
         }
 
         if (!isValidHttpUrl(getLevel[i].querySelector('.levelURL').value)) {
+            getLevel[i].querySelector(".levelURL")
+            .classList.add("fillerrado");
+
+            getLevel[i].querySelector('.levelURLAlert')
+            .innerHTML = 'A URL da imagem é inválida.';
             check = false;
-            console.log(`A URL da imagem do nível ${i + 1} é inválido`);
+        } else {
+            if( getLevel[i].querySelector(".levelURL")
+            .classList.contains("fillerrado")) {
+                getLevel[i].querySelector('.levelURLAlert')
+            .innerHTML = '';
+            }
         }
 
         if (getLevel[i].querySelector('.levelDesc').value.length < 30) {
+            getLevel[i].querySelector(".levelDesc")
+            .classList.add("fillerrado");
+
+            getLevel[i].querySelector('.levelDescAlert')
+            .innerHTML = 'A descrição precisa ter pelo menos 30 carácteres.';
             check = false;
-            console.log(`A descrição do nível ${i + 1} precisa ter pelo menos 30 carácteres`);
+        } else {
+            if( getLevel[i].querySelector(".levelDesc")
+            .classList.contains("fillerrado")) {
+                getLevel[i].querySelector('.levelDescAlert')
+            .innerHTML = '';
+            }
         }
 
     }
-
-    if (!isZero) {
-        check = false;
-        console.log('É obrigatório existir pelo menos 1 nível cuja % de acerto mínima seja 0%');
+    for (let i = 0; i < getLevel.length; i++) {
+        if (!isZero) {
+        
+            getLevel[i].querySelector('.minValAlert')
+            .innerHTML = 'É obrigatório existir pelo menos um nível cuja % de acerto mínima seja 0%.';
+            check = false;
+            
+        } else {
+            getLevel[i].querySelector('.minValAlert')
+            .innerHTML = '';
+        }
     }
+    
 
     if (check) {
         sendToServer.levels = [];
@@ -1007,3 +1363,7 @@ function debugLevels() {
     renderLevels(2);
 }
 
+function debugQuestions(){
+    showQuestions();
+    renderQuestions(3);
+}
