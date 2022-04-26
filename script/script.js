@@ -122,6 +122,8 @@ function aparecerQuizz(element, showType = 0) {
         loadCircle.display = "inline-block";
         promise.then(exibirQuizzSelect);
     } else {
+        parent.classList.remove('container4');
+        parent.classList.add('container2');
         parent.innerHTML += `<div class="img-titulo">
         <img src=${InfosquizzSelect.image}>
         <h2>${InfosquizzSelect.title}</h2>
